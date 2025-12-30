@@ -7,7 +7,7 @@ import {
   ShieldCheck, Share2, Info, Star, Smartphone, 
   AlertTriangle, Scale, CheckCircle, Copy, Bell, ArrowLeft 
 } from 'lucide-react'
-import ThemeToggle from '../../../../components/ThemeToggle' // Sahi rasta
+import ThemeToggle from '../../../components/ThemeToggle' // Sahi rasta
 
 export default function AppDetail({ params: paramsPromise }) {
   const params = use(paramsPromise)
