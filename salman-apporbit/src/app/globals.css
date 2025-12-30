@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+:root {
+  --bg-body: #f8f9fa;
+  --bg-card: #ffffff;
+  --primary: #2ea64d; /* AN1 Green */
+  --text-main: #333333;
+  --text-muted: #777777;
+}
+
+.dark {
+  --bg-body: #121212;
+  --bg-card: #1e1e1e;
+  --text-main: #eeeeee;
+  --text-muted: #aaaaaa;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* AN1 Style Card */
+.an1-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.2s ease-in-out;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.an1-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Detail Info Table */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  font-size: 13px;
+}

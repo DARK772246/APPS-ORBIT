@@ -1,0 +1,85 @@
+import './globals.css'
+import { ThemeProvider } from '../components/ThemeProvider'
+import Footer from '../components/Footer'
+import InstallPrompt from '../components/InstallPrompt'
+import Script from 'next/script'
+import { MessageCircle } from 'lucide-react'
+
+// SEO aur PWA Metadata
+export const metadata = {
+  title: 'Salman AppOrbit | Premium App Store',
+  description: 'Verified Android Mods by Salman Khan. Fast, Secure, and Affordable.',
+  manifest: '/manifest.json',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Salman AppOrbit',
+  },
+}
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* 1. GOOGLE ADSENSE META TAG (Verification ke liye) */}
+        <meta name="google-adsense-account" content="ca-pub-6036065566084740" />
+
+        {/* 2. GOOGLE ADSENSE SCRIPT (Ads dikhane ke liye) */}
+        <Script
+          id="adsense-init"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6036065566084740"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
+
+        {/* 3. PWA & Theme Settings */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#24cd77" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        
+        {/* 4. PWA Service Worker Registration */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js');
+              });
+            }
+          `
+        }} />
+      </head>
+
+      <body className="antialiased bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white transition-colors duration-300">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <div className="flex flex-col min-h-screen">
+            
+            {/* Main Website Pages */}
+            <main className="flex-grow">
+              {children}
+            </main>
+            
+            {/* "Install App" Floating Banner */}
+            <InstallPrompt />
+
+            {/* Professional Footer with Social Links */}
+            <Footer />
+
+            {/* Floating WhatsApp Support Button */}
+            <a 
+              href="https://wa.me/923275176283" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="fixed bottom-6 right-6 z-[200] bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform active:scale-95 flex items-center gap-2 group"
+            >
+              <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 text-[10px] font-black uppercase whitespace-nowrap px-1">Support</span>
+              <MessageCircle size={24}/>
+            </a>
+
+          </div>
+        </ThemeProvider>
+      </body>
+    </html>
+  )
+}
