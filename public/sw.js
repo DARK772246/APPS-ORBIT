@@ -1,8 +1,12 @@
-self.addEventListener('install', (e) => {
-  console.log('Salman AppOrbit Service Worker Installed');
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
 });
 
-self.addEventListener('fetch', (e) => {
-  // Ye app ko offline chalne mein madad deta hai
-  e.respondWith(fetch(e.request));
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim());
+});
+
+self.addEventListener('fetch', (event) => {
+  // Offline support ke liye
+  event.respondWith(fetch(event.request));
 });

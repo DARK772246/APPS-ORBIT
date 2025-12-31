@@ -5,13 +5,11 @@ import InstallPrompt from '../components/InstallPrompt'
 import Script from 'next/script'
 import { MessageCircle } from 'lucide-react'
 
-// SEO, Search Console aur PWA Metadata
 export const metadata = {
   title: 'Salman AppOrbit | Premium App Store',
   description: 'Verified Android Mods by Salman Khan. Fast, Secure, and Affordable.',
   manifest: '/manifest.json',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
-  googleSiteVerification: 'NhPDdeUA4e58lgelt3il5KTAcy-yNYUK88xRZlo8l9k', // Verification Link
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -23,13 +21,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* 1. NEW GOOGLE SEARCH CONSOLE VERIFICATION (HTTPS Version) */}
         <meta name="google-site-verification" content="NhPDdeUA4e58lgelt3il5KTAcy-yNYUK88xRZlo8l9k" />
-
-        {/* 2. GOOGLE ADSENSE META TAG */}
         <meta name="google-adsense-account" content="ca-pub-60360655566084740" />
-
-        {/* 3. GOOGLE ADSENSE SCRIPT */}
         <Script
           id="adsense-init"
           async
@@ -37,40 +30,22 @@ export default function RootLayout({ children }) {
           strategy="afterInteractive"
           crossOrigin="anonymous"
         />
-
-        {/* 4. PWA & Theme Icons */}
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#24cd77" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
-        
-        {/* 5. PWA Service Worker Registration */}
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            if ('serviceWorker' in navigator) {
-              window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js');
-              });
-            }
-          `
-        }} />
       </head>
 
       <body className="antialiased bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <div className="flex flex-col min-h-screen">
             
-            {/* Main Page Body */}
             <main className="flex-grow">
               {children}
             </main>
             
-            {/* PWA Install Banner */}
             <InstallPrompt />
-
-            {/* Global Footer */}
             <Footer />
 
-            {/* Floating WhatsApp Support Button */}
             <a 
               href="https://wa.me/923275176283" 
               target="_blank" 
@@ -81,6 +56,20 @@ export default function RootLayout({ children }) {
               <MessageCircle size={24}/>
             </a>
 
+            {/* PWA REGISTRATION SCRIPT */}
+            <Script id="pwa-sw" strategy="afterInteractive">
+              {`
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                      console.log('SW registered:', reg);
+                    }).catch(function(err) {
+                      console.log('SW error:', err);
+                    });
+                  });
+                }
+              `}
+            </Script>
           </div>
         </ThemeProvider>
       </body>
