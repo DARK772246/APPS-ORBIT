@@ -22,17 +22,17 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* 1. GOOGLE SEARCH CONSOLE VERIFICATION */}
+        {/* 1. NEW GOOGLE SEARCH CONSOLE VERIFICATION (HTTPS) */}
         <meta name="google-site-verification" content="NhPDdeUA4e58lgelt3il5KTAcy-yNYUK88xRZlo8l9k" />
 
         {/* 2. GOOGLE ADSENSE META TAG */}
-        <meta name="google-adsense-account" content="ca-pub-6036065566084740" />
+        <meta name="google-adsense-account" content="ca-pub-60360655566084740" />
 
         {/* 3. GOOGLE ADSENSE SCRIPT */}
         <Script
           id="adsense-init"
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6036065566084740"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-60360655566084740"
           strategy="afterInteractive"
           crossOrigin="anonymous"
         />
@@ -58,18 +58,14 @@ export default function RootLayout({ children }) {
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <div className="flex flex-col min-h-screen">
             
-            {/* Main Website Pages */}
             <main className="flex-grow">
               {children}
             </main>
             
-            {/* "Install App" Floating Banner */}
             <InstallPrompt />
-
-            {/* Professional Footer with Social Links */}
             <Footer />
 
-            {/* Floating WhatsApp Support Button */}
+            {/* Floating WhatsApp Support */}
             <a 
               href="https://wa.me/923275176283" 
               target="_blank" 
