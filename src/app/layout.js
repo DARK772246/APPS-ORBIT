@@ -22,10 +22,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* 1. GOOGLE ADSENSE META TAG (Verification ke liye) */}
+        {/* 1. GOOGLE SEARCH CONSOLE VERIFICATION */}
+        <meta name="google-site-verification" content="NhPDdeUA4e58lgelt3il5KTAcy-yNYUK88xRZlo8l9k" />
+
+        {/* 2. GOOGLE ADSENSE META TAG */}
         <meta name="google-adsense-account" content="ca-pub-6036065566084740" />
 
-        {/* 2. GOOGLE ADSENSE SCRIPT (Ads dikhane ke liye) */}
+        {/* 3. GOOGLE ADSENSE SCRIPT */}
         <Script
           id="adsense-init"
           async
@@ -34,12 +37,12 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
         />
 
-        {/* 3. PWA & Theme Settings */}
+        {/* 4. PWA & Theme Settings */}
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#24cd77" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
         
-        {/* 4. PWA Service Worker Registration */}
+        {/* 5. PWA Service Worker Registration */}
         <script dangerouslySetInnerHTML={{
           __html: `
             if ('serviceWorker' in navigator) {
