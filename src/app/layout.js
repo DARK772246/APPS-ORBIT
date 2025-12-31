@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* 1. NEW GOOGLE SEARCH CONSOLE VERIFICATION (HTTPS) */}
+        {/* 1. NEW GOOGLE SEARCH CONSOLE VERIFICATION (HTTPS Version) */}
         <meta name="google-site-verification" content="NhPDdeUA4e58lgelt3il5KTAcy-yNYUK88xRZlo8l9k" />
 
         {/* 2. GOOGLE ADSENSE META TAG */}
@@ -58,21 +58,25 @@ export default function RootLayout({ children }) {
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <div className="flex flex-col min-h-screen">
             
+            {/* Main Website Pages Content */}
             <main className="flex-grow">
               {children}
             </main>
             
+            {/* Floating Install App Prompt (PWA) */}
             <InstallPrompt />
+
+            {/* Professional Footer with Links */}
             <Footer />
 
-            {/* Floating WhatsApp Support */}
+            {/* Floating WhatsApp Support Button */}
             <a 
               href="https://wa.me/923275176283" 
               target="_blank" 
               rel="noopener noreferrer"
               className="fixed bottom-6 right-6 z-[200] bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform active:scale-95 flex items-center gap-2 group"
             >
-              <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 text-[10px] font-black uppercase whitespace-nowrap px-1">Support</span>
+              <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 text-[10px] font-black uppercase whitespace-nowrap px-1 text-white">Support</span>
               <MessageCircle size={24}/>
             </a>
 
