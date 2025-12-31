@@ -24,15 +24,17 @@ export default function Home() {
   const [wishlist, setWishlist] = useState([])
   const [mounted, setMounted] = useState(false)
 
-  // --- YAHA APNA STORE APK LINK DALEIN ---
-  const STORE_APK_LINK = "https://your-supabase-link.com/apks/salman-apporbit.apk" 
+  // --- SALMAN APPORBIT OFFICIAL APK LINK ---
+  const STORE_APK_LINK = "https://www.dropbox.com/scl/fi/nocorabl08f850f6zppa3/app-release.apk?rlkey=0lzvmjf9zgs7wk824xfz6lt88&st=met7ejhz&dl=1";
 
   useEffect(() => {
     setMounted(true)
     fetchData()
     const saved = JSON.parse(localStorage.getItem('wishlist') || '[]')
     setWishlist(saved)
-    const timer = setInterval(() => { if (slides.length > 0) setCurrentSlide(s => (s + 1) % slides.length) }, 6000)
+    const timer = setInterval(() => { 
+      if (slides.length > 0) setCurrentSlide(s => (s + 1) % slides.length) 
+    }, 6000)
     return () => clearInterval(timer)
   }, [slides.length])
 
@@ -76,8 +78,8 @@ export default function Home() {
       <div className="bg-[#2ea64d] text-white py-2 overflow-hidden relative z-[110] border-b border-white/10 shadow-lg">
         <div className="flex whitespace-nowrap animate-marquee">
           <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-6 px-4 italic">
-            <BellRing size={12}/> Salman AppOrbit v2.0 is Live! 🚀 • Safe Premium Programs Verified • Fast Direct Access • 
-            <Zap size={12}/> Join Pakistan's No.1 Pro Store • New Insight: {articles[0]?.title || 'Orbit News'} • 
+            <BellRing size={12}/> Salman AppOrbit Official APK is now Available for Download! 🚀 • Verified Premium Apps by Salman Khan • Fast Access • 
+            <Zap size={12}/> Join Pakistan's No.1 Tech Galaxy • Daily Updates & Secure Mods • 
           </span>
         </div>
       </div>
@@ -101,21 +103,17 @@ export default function Home() {
 
           <div className="flex items-center gap-4">
             <ThemeToggle /><Search className="text-gray-400 cursor-pointer hover:text-[#2ea64d]" onClick={() => setSearchOpen(!searchOpen)}/>
-            <Link href="/wishlist" className="relative p-1 text-gray-400 hover:text-red-500 transition-colors">
-              ❤️{wishlist.length > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-md animate-bounce">{wishlist.length}</span>}
-            </Link>
+            <Link href="/wishlist" className="relative p-1">❤️{wishlist.length > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold animate-pulse shadow-md">{wishlist.length}</span>}</Link>
           </div>
         </div>
       </nav>
 
       {/* SEARCH OVERLAY */}
-      <AnimatePresence>
-        {searchOpen && (
-          <motion.div initial={{height:0}} animate={{height:'auto'}} exit={{height:0}} className="fixed top-16 left-0 right-0 bg-white dark:bg-[#1e1e1e] border-b p-4 z-50 overflow-hidden shadow-2xl">
-            <input autoFocus type="text" placeholder="Search Orbit..." className="w-full bg-gray-100 dark:bg-black/40 p-4 rounded-xl outline-none text-sm ring-1 ring-gray-200 dark:ring-white/10 focus:ring-[#2ea64d] dark:text-white font-bold" onChange={e => setSearchTerm(e.target.value)} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <AnimatePresence>{searchOpen && (
+        <motion.div initial={{height:0}} animate={{height:'auto'}} exit={{height:0}} className="fixed top-16 left-0 right-0 bg-white dark:bg-[#1e1e1e] border-b p-4 z-50 overflow-hidden shadow-2xl">
+          <input autoFocus type="text" placeholder="Search Orbit..." className="w-full bg-gray-100 dark:bg-black/40 p-4 rounded-xl outline-none text-sm ring-1 ring-gray-200 dark:ring-white/10 focus:ring-[#2ea64d] dark:text-white font-bold" onChange={e => setSearchTerm(e.target.value)} />
+        </motion.div>
+      )}</AnimatePresence>
 
       {/* 3. AUTO SLIDER */}
       {slides.length > 0 && (
@@ -136,7 +134,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 4. OFFICIAL APP BANNER (DIRECT DOWNLOAD FIX) */}
+      {/* 4. OFFICIAL APP BANNER (DIRECT DOWNLOAD INTEGRATED) */}
       <section className="max-w-7xl mx-auto px-4 mt-12">
         <div className="bg-white dark:bg-[#111] border border-[#2ea64d]/30 p-8 rounded-[3rem] flex flex-col md:flex-row items-center justify-between gap-8 shadow-sm group overflow-hidden relative">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#2ea64d]/10 blur-[60px] group-hover:bg-[#2ea64d]/20 transition-all"></div>
@@ -150,7 +148,6 @@ export default function Home() {
             </div>
           </div>
           <div className="z-10 w-full md:w-auto">
-            {/* FIXED: Using direct href instead of WhatsApp Link */}
             <a href={STORE_APK_LINK} target="_blank" rel="noopener noreferrer">
               <button className="w-full bg-[#2ea64d] hover:bg-[#268a40] text-white font-black px-10 py-4 rounded-2xl uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3 italic">
                 <DownloadCloud size={18}/> Download Salman AppOrbit APK
@@ -179,10 +176,10 @@ export default function Home() {
                   <button onClick={(e) => toggleWishlist(e, app.id)} className="absolute top-2 right-2 z-20 text-xs">{wishlist.includes(app.id) ? '❤️' : '🤍'}</button>
                   <Link href={`/apps/${app.id}`} className="w-full flex flex-col items-center">
                     <div className="w-full aspect-square rounded-xl overflow-hidden mb-4 bg-gray-100 dark:bg-black/20 border border-gray-100 dark:border-white/5 shadow-inner">
-                      {app.icon_url && <img src={app.icon_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" loading="lazy" />}
+                      {app.icon_url && <img src={app.icon_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={app.title} loading="lazy" />}
                     </div>
                     <h3 className="text-[12px] font-bold truncate w-full text-center uppercase dark:text-gray-100 text-gray-800">{app.title}</h3>
-                    <button className="w-full bg-[#2ea64d] hover:bg-[#268a40] text-white text-[10px] font-black py-2 rounded-lg uppercase mt-2 shadow-sm transition-all active:scale-95">Download</button>
+                    <button className="w-full bg-[#2ea64d] hover:bg-[#268a40] text-white text-[10px] font-black py-2 rounded-lg uppercase mt-2 shadow-sm">Download</button>
                   </Link>
                 </div>
               );
@@ -190,7 +187,20 @@ export default function Home() {
           </div>
         )}
 
-        {/* 6. TECH INSIGHTS (6 ARTICLES) */}
+        {/* 6. REQUEST TRACKER */}
+        <section className="bg-white dark:bg-[#111] rounded-[2.5rem] p-8 border border-gray-100 dark:border-white/5 mb-24 shadow-sm">
+           <h2 className="text-xl font-black uppercase italic tracking-tighter mb-8 border-l-4 border-blue-500 pl-4 dark:text-white text-gray-800 leading-none">Community Tracker</h2>
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 italic font-medium">
+              {userRequests.map((req, i) => (
+                <div key={i} className="p-4 bg-gray-50 dark:bg-black/30 rounded-2xl border dark:border-white/5 flex justify-between items-center italic">
+                   <div><p className="text-[11px] font-black uppercase dark:text-white truncate max-w-[150px]">{req.app_name}</p><p className="text-[8px] text-gray-400 uppercase font-bold mt-1">Status: {req.status || 'Checking'}</p></div>
+                   <div className={`w-2.5 h-2.5 rounded-full ${req.status?.toLowerCase().includes('added') ? 'bg-green-500 animate-pulse' : 'bg-blue-500'}`} />
+                </div>
+              ))}
+           </div>
+        </section>
+
+        {/* 7. BLOG FEED (6 ARTICLES) */}
         <section className="mt-32">
           <h2 className="text-2xl font-black uppercase italic mb-10 border-l-4 border-orange-500 pl-4 dark:text-white text-gray-800 italic">Orbit Tech Insights</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -202,9 +212,9 @@ export default function Home() {
                   ) : (
                     <ImageIcon size={40} className="opacity-10 text-gray-400" />
                   )}
-                  <div className="absolute bottom-2 left-2 bg-orange-500 text-white text-[7px] font-black px-2 py-0.5 rounded shadow-lg uppercase">Read Insight</div>
+                  <div className="absolute bottom-2 left-2 bg-orange-500 text-white text-[7px] font-black px-2 py-0.5 rounded shadow-lg uppercase">Read More</div>
                 </div>
-                <div className="p-2 flex-grow">
+                <div className="px-2 flex-grow">
                   <p className="text-[9px] font-black text-orange-500 uppercase mb-2 flex items-center gap-1"><PenTool size={10}/> By {art.author}</p>
                   <h3 className="text-[15px] font-black leading-tight uppercase group-hover:text-[#2ea64d] transition-colors line-clamp-2 italic">{art.title}</h3>
                   <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-3 italic line-clamp-2 leading-relaxed font-serif">"{art.content.substring(0, 100)}..."</p>
@@ -212,6 +222,26 @@ export default function Home() {
               </Link>
             ))}
           </div>
+        </section>
+
+        {/* 8. FAQ SECTION */}
+        <section className="mt-32 pt-20 border-t dark:border-white/5 grid grid-cols-1 lg:grid-cols-2 gap-20">
+            <div>
+              <h2 className="text-xl font-black uppercase italic mb-8 tracking-widest text-[#2ea64d] italic">Verified FAQ</h2>
+              <div className="space-y-4">
+                {[ { q: "Is Salman AppOrbit safe?", a: "Every program is manually scanned on physical Android devices by Salman Khan to ensure 100% security." }, { q: "How to update?", a: "Check the 'Update' badge on the home screen to get the latest optimized premium version." } ].map((item, i) => (
+                  <div key={i} className="p-6 bg-white dark:bg-[#111] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm">
+                    <h4 className="font-black text-xs mb-2 uppercase text-[#2ea64d]">Q: {item.q}</h4>
+                    <p className="text-xs text-gray-500 italic">"{item.a}"</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="bg-[#2ea64d]/5 p-10 rounded-[3rem] border border-[#2ea64d]/20 text-center flex flex-col justify-center shadow-inner italic">
+               <ShieldCheck className="mx-auto mb-4 text-[#2ea64d]" size={40}/>
+               <h3 className="font-black uppercase italic mb-2 tracking-tighter">Verified Security</h3>
+               <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed uppercase font-bold tracking-widest leading-loose">"Providing Pakistan with a secure ecosystem for premium Android software. Your safety is our priority." - Salman Khan</p>
+            </div>
         </section>
       </main>
     </div>
