@@ -1,13 +1,11 @@
 @import "tailwindcss";
 
-/* 1. THEME VARIABLES (Light \u0026 Dark Mode) */
+/* 1. THEME VARIABLES (Light & Dark Mode) */
 :root {
   --bg-body: #f8f9fa;
   --bg-card: #ffffff;
-  --primary: #2ea64d; /* AN1 Green */
-  --primary-hover: #268a40;
+  --primary: #2ea64d; /* AN1 Signature Green */
   --text-main: #1a1a1a;
-  --text-muted: #666666;
   --border-color: rgba(0, 0, 0, 0.05);
 }
 
@@ -15,22 +13,24 @@
   --bg-body: #0a0a0a;
   --bg-card: #121212;
   --primary: #2ea64d;
-  --primary-hover: #24cd77;
   --text-main: #f8f9fa;
-  --text-muted: #999999;
   --border-color: rgba(255, 255, 255, 0.05);
 }
 
-/* 2. BASE STYLES */
+/* 2. BASE RESET & SMOOTHNESS */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--bg-body);
   color: var(--text-main);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Marquee ke liye zaroori hai */
 }
 
-/* 3. NEWS TICKER (MARQUEE) ANIMATION */
+/* 3. FIXED NEWS TICKER (Strictly One Line) */
 @keyframes marquee {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
@@ -38,14 +38,30 @@ body {
 
 .animate-marquee {
   display: inline-block;
-  animation: marquee 25s linear infinite;
+  white-space: nowrap; /* FIXED: Yeh text ko doosri line par jane se rokega */
+  animation: marquee 30s linear infinite;
+  will-change: transform;
 }
 
 .animate-marquee:hover {
-  animation-play-state: paused; /* User mouse le jaye toh ruk jaye */
+  animation-play-state: paused; /* User mouse rakhe toh news ruk jaye */
 }
 
-/* 4. CUSTOM PROFESSIONAL SCROLLBAR */
+/* 4. AN1 STYLE CARD UI */
+.an1-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.an1-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--primary);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.1);
+}
+
+/* 5. CUSTOM PROFESSIONAL SCROLLBAR */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -55,77 +71,26 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333333;
+  background: #333;
   border-radius: 10px;
-  border: 2px solid var(--bg-body);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #2ea64d;
-}
-
-::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
 
-/* 5. AN1 STYLE CARD UI */
-.an1-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.an1-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: var(--primary);
-}
-
-/* 6. SKELETON LOADING ANIMATION */
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* 7. GLASSMORPHISM UTILITY */
+/* 6. UTILITIES */
 .glass {
-  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* 8. HIDE SCROLLBAR UTILITY (For Category Tabs) */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* 9. BLOG TYPOGRAPHY */
-.prose {
-  line-height: 1.8;
-  letter-spacing: 0.01em;
-}
-
-.prose p {
-  margin-bottom: 1.5rem;
-}
-
-/* 10. BUTTONS \u0026 INPUTS */
-input::placeholder {
-  color: #666;
-  font-style: italic;
-}
-
-button:active {
-  transform: scale(0.95);
+/* Image scaling fix */
+img {
+  max-width: 100%;
+  height: auto;
 }

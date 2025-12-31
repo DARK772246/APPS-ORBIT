@@ -1,242 +1,145 @@
 "use client"
-import { useEffect, useState, use } from 'react'
-import { supabase } from '../../../supabase'
+import { useEffect, useState } from 'react'
+import { supabase } from '../supabase'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { 
-  ShieldCheck, Share2, Info, Star, Smartphone, 
-  AlertTriangle, Scale, CheckCircle, Copy, Bell, ArrowLeft, Zap 
-} from 'lucide-react'
-import ThemeToggle from '../../../components/ThemeToggle'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Home as HomeIcon, Search, Heart, LayoutGrid, MessageSquare, Star, Bell, Filter } from 'lucide-react'
 
-export default function AppDetail({ params: paramsPromise }) {
-  const params = use(paramsPromise)
-  const id = params.id
-  
-  const [app, setApp] = useState(null)
-  const [relatedApps, setRelatedApps] = useState([])
-  const [reviews, setReviews] = useState([])
-  const [showPayment, setShowPayment] = useState(false)
-  const [scanning, setScanning] = useState(true)
-  const [newReview, setNewReview] = useState({ user_name: '', rating: 5, comment: '' })
-  const [isRecentlyUpdated, setIsRecentlyUpdated] = useState(false)
+export default function GamingStore() {
+  const [apps, setApps] = useState([])
+  const [showStore, setShowStore] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchData();
-    const timer = setTimeout(() => setScanning(false), 2000)
-    return () => clearTimeout(timer)
-  }, [id])
-
-  async function fetchData() {
-    try {
-      const { data: appData } = await supabase.from('apps').select('*').eq('id', id).single()
-      if (appData) {
-        setApp(appData)
-        document.title = `${appData.title} v${appData.version} - Salman AppOrbit`
-        
-        // Fetch Related Apps
-        const { data: related } = await supabase.from('apps').select('*').eq('category', appData.category).neq('id', id).limit(4)
-        setRelatedApps(related || [])
-
-        // Check Update Status
-        const lastUpdate = new Date(appData.updated_at || appData.created_at)
-        const diff = (new Date() - lastUpdate) / (1000 * 60 * 60)
-        if (diff < 48) setIsRecentlyUpdated(true)
-      }
-      const { data: revData } = await supabase.from('reviews').select('*').eq('app_id', id).order('created_at', { ascending: false })
-      if (revData) setReviews(revData)
-    } catch (err) { console.error("Orbit Error:", err) }
-  }
-
-  const handleAction = () => {
-    if (app.is_free) window.location.href = `/apps/${id}/download`
-    else setShowPayment(true)
-  }
-
-  const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href)
-    alert("Link Copied! 🛰️")
-  }
-
-  const reportIssue = async () => {
-    const reason = prompt("What's the issue? (e.g. Broken Link, App Crashes, Update Needed)")
-    if (reason) {
-      await supabase.from('reports').insert([{ app_id: id, app_name: app.title, issue_type: reason }])
-      alert("Report sent to Salman Khan. Thanks!")
+    async function fetchApps() {
+      const { data } = await supabase.from('apps').select('*').order('created_at', { ascending: false })
+      if (data) setApps(data)
+      setLoading(false)
     }
-  }
-
-  if (!app) return <div className="min-h-screen bg-white dark:bg-[#0a0a0a] flex items-center justify-center text-[#2ea64d] font-black animate-pulse uppercase tracking-[0.5em]">Establishing Connection...</div>
+    fetchApps()
+  }, [])
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#0a0a0a] text-gray-900 dark:text-white transition-colors duration-300 font-sans pb-20">
-      
-      {/* NAVBAR */}
-      <nav className="p-4 border-b border-gray-100 dark:border-white/5 sticky top-0 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md z-50 px-6 flex justify-between items-center shadow-sm">
-        <Link href="/" className="text-[10px] font-black uppercase text-gray-400 hover:text-[#2ea64d] flex items-center gap-2">
-          <ArrowLeft size={14}/> Back to Galaxy
-        </Link>
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
-          <button onClick={copyLink} className="p-2 hover:text-blue-500 transition-colors"><Copy size={16}/></button>
-          <button onClick={() => window.open(`https://wa.me/?text=Download ${app.title}: ${window.location.href}`)} className="p-2 hover:text-[#2ea64d]"><Share2 size={18}/></button>
-        </div>
-      </nav>
-
-      <main className="max-w-5xl mx-auto px-6 py-10">
-        
-        {/* NEW UPDATE NOTIFICATION */}
-        {isRecentlyUpdated && (
-          <div className="bg-blue-600 text-white p-4 rounded-2xl mb-8 flex items-center gap-3 shadow-lg animate-in slide-in-from-top-4">
-            <Bell className="animate-bounce" size={20}/>
-            <p className="text-[10px] font-black uppercase tracking-widest leading-loose">Orbit Alert: v{app.version} update is now live! New features verified.</p>
-          </div>
-        )}
-
-        {/* HEADER SECTION */}
-        <div className="flex flex-col md:flex-row gap-10 items-center md:items-start mb-12 border-b border-gray-100 dark:border-white/5 pb-12 text-center md:text-left">
-          <div className="w-48 h-48 bg-gray-100 dark:bg-[#121212] rounded-[3rem] overflow-hidden border border-gray-100 dark:border-white/10 shadow-2xl flex items-center justify-center flex-shrink-0">
-            {app.icon_url ? <img src={app.icon_url} className="w-full h-full object-cover" alt="" /> : <span className="text-7xl">📱</span>}
-          </div>
-          <div className="flex-1 w-full">
-            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-2 italic leading-none">{app.title}</h1>
-            <p className="text-[#2ea64d] font-bold text-[10px] uppercase tracking-[0.4em] mb-8">Software Intelligence • v{app.version}</p>
-            
-            {scanning ? (
-              <div className="inline-flex items-center gap-3 bg-blue-500/5 px-6 py-3 rounded-2xl mb-8 animate-pulse"><div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div><p className="text-[10px] font-black uppercase text-blue-500 tracking-widest italic">Scanning Orbit Assets...</p></div>
-            ) : (
-              <div className="inline-flex items-center gap-3 bg-green-500/5 px-6 py-3 rounded-2xl mb-8"><ShieldCheck className="text-green-500" size={20}/><p className="text-[10px] font-black uppercase text-green-500 tracking-widest italic">Verified Virus-Free</p></div>
-            )}
-
-            <div className="flex flex-col md:flex-row gap-4 items-center">
+    <div className="min-h-screen bg-[#050b18] text-white selection:bg-blue-500/30">
+      <AnimatePresence mode="wait">
+        {!showStore ? (
+          /* --- SCREEN 1: SPLASH (3D POP-OUT LOOK) --- */
+          <motion.div 
+            key="splash"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.1 }}
+            className="relative h-screen flex flex-col items-center justify-end pb-24 px-10 text-center"
+          >
+            <div className="absolute inset-0 z-0">
+               <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000" className="w-full h-full object-cover opacity-40 scale-125" alt="" />
+               <div className="absolute inset-0 bg-gradient-to-t from-[#050b18] via-[#050b18]/60 to-transparent"></div>
+            </div>
+            <div className="relative z-10 space-y-8">
+              <h1 className="text-5xl font-black leading-tight uppercase italic tracking-tighter drop-shadow-2xl">
+                Enjoy the best <br/> <span className="text-blue-500">Galaxy</span> ever
+              </h1>
               <button 
-                onClick={handleAction} 
-                className="w-full md:w-auto bg-[#2ea64d] text-white font-black px-14 py-5 rounded-2xl uppercase text-[11px] shadow-xl shadow-green-500/20 active:scale-95 transition-all"
+                onClick={() => setShowStore(true)}
+                className="bg-[#3b82f6] hover:bg-blue-600 text-white font-black px-16 py-5 rounded-[2rem] uppercase tracking-widest text-xs shadow-[0_20px_40px_rgba(59,130,246,0.3)] transition-all active:scale-95"
               >
-                {app.is_free ? 'Secure Download' : `Unlock Access (${app.price})`}
+                Lets Get Started
               </button>
-              <button onClick={reportIssue} className="text-[10px] font-black uppercase text-red-500 hover:text-red-600 transition-colors underline decoration-red-500/20 tracking-widest italic">Report Issue</button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        ) : (
+          /* --- SCREEN 2: MAIN STORE (EXACT LAYOUT) --- */
+          <motion.div 
+            key="store"
+            initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }}
+            className="pb-32 pt-6"
+          >
+            <div className="bg-glow top-0 left-0"></div>
+            <div className="bg-glow bottom-0 right-0"></div>
 
-        {/* ORBIT GUARANTEE TRUST BADGES */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-           <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl flex items-center gap-3">
-              <ShieldCheck className="text-blue-500" size={24}/>
-              <div><p className="text-[10px] font-black uppercase text-blue-500">Safe Scan</p><p className="text-[8px] text-gray-500">Verified by Salman</p></div>
-           </div>
-           <div className="p-4 bg-[#2ea64d]/5 border border-[#2ea64d]/10 rounded-2xl flex items-center gap-3">
-              <Zap className="text-[#2ea64d]" size={24}/>
-              <div><p className="text-[10px] font-black uppercase text-[#2ea64d]">Fast Link</p><p className="text-[8px] text-gray-500">Secure Direct Server</p></div>
-           </div>
-           <div className="p-4 bg-orange-500/5 border border-orange-500/10 rounded-2xl flex items-center gap-3">
-              <Star className="text-orange-500" size={24}/>
-              <div><p className="text-[10px] font-black uppercase text-orange-500">100% Works</p><p className="text-[8px] text-gray-500">Tested on Android 14</p></div>
-           </div>
-        </div>
-
-        {/* TECHNICAL SPECS TABLE (AN1 STYLE) */}
-        <div className="bg-white dark:bg-[#111] border border-gray-100 dark:border-white/5 rounded-[2.5rem] p-8 mb-16 shadow-sm">
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-1">
-              {[
-                { l: 'File Size', v: app.size || 'Varies' },
-                { l: 'Android Required', v: app.min_android || '8.0+' },
-                { l: 'Last Updated', v: new Date(app.updated_at || app.created_at).toLocaleDateString(), c: 'text-blue-500' },
-                { l: 'Status', v: 'Verified & Working ✅', c: 'text-[#24cd77]' }
-              ].map((row, i) => (
-                <div key={i} className="flex justify-between py-3.5 border-b border-gray-50 dark:border-white/5 text-[11px] font-bold uppercase tracking-widest font-mono">
-                   <span className="text-gray-400">{row.l}</span>
-                   <span className={row.c || 'text-gray-800 dark:text-gray-200'}>{row.v}</span>
-                </div>
-              ))}
-           </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2 space-y-12">
-              {/* DESCRIPTION SECTION */}
-              <section>
-                <h3 className="text-sm font-black uppercase mb-6 text-gray-400 tracking-widest italic flex items-center gap-2"><Info size={16}/> Overview</h3>
-                <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-sm font-serif italic whitespace-pre-wrap border-l-2 border-gray-200 dark:border-white/5 pl-6">
-                  "{app.description}"
-                </p>
-              </section>
-
-              {/* WHATS NEW SECTION */}
-              {app.whats_new && (
-                <section className="p-8 bg-blue-500/5 border-l-4 border-blue-500 rounded-r-[2.5rem]">
-                  <h3 className="text-[10px] font-black uppercase text-blue-500 mb-4 tracking-widest flex items-center gap-2"><Bell size={14}/> What's New</h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-300 italic leading-relaxed whitespace-pre-wrap">● {app.whats_new}</p>
-                </section>
-              )}
-
-              {/* RELATED APPS SECTION */}
-              {relatedApps.length > 0 && (
-                <section className="pt-10 border-t dark:border-white/5">
-                  <h3 className="text-sm font-black uppercase text-[#2ea64d] mb-8 tracking-widest italic italic border-l-4 border-[#2ea64d] pl-4">Similar Pro Programs</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {relatedApps.map(rel => (
-                      <Link key={rel.id} href={`/apps/${rel.id}`} className="bg-white dark:bg-[#111] p-4 rounded-[2rem] border border-gray-100 dark:border-white/5 hover:border-[#2ea64d] transition-all group shadow-sm">
-                        <img src={rel.icon_url} className="w-14 h-14 rounded-2xl mb-4 object-cover group-hover:scale-110 transition-transform shadow-md" alt="" />
-                        <h4 className="text-[10px] font-black uppercase truncate dark:text-gray-100 mb-1">{rel.title}</h4>
-                        <p className="text-[9px] text-[#2ea64d] font-black uppercase">Verified</p>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
-              )}
-            </div>
-
-            {/* SIDEBAR: FEEDBACK */}
-            <div className="lg:col-span-1 space-y-8">
-              <div className="bg-gray-50 dark:bg-[#121212] p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm">
-                <h3 className="text-[10px] font-black uppercase mb-6 text-[#24cd77] tracking-widest">Post Feedback</h3>
-                <form onSubmit={async (e) => { e.preventDefault(); await supabase.from('reviews').insert([{...newReview, app_id:id}]); setNewReview({user_name:'',rating:5,comment:''}); fetchData(); }} className="space-y-3">
-                  <input required className="w-full bg-white dark:bg-black border border-gray-100 dark:border-white/10 p-3.5 rounded-xl text-xs outline-none focus:border-[#24cd77]" placeholder="Name" value={newReview.user_name} onChange={e => setNewReview({...newReview, user_name:e.target.value})} />
-                  <textarea required className="w-full bg-white dark:bg-black border border-gray-100 dark:border-white/10 p-3.5 rounded-xl text-xs outline-none italic" rows="3" placeholder="Experience..." value={newReview.comment} onChange={e => setNewReview({...newReview, comment:e.target.value})} />
-                  <button className="w-full bg-black dark:bg-white text-white dark:text-black font-black py-4 rounded-xl text-[10px] uppercase tracking-tighter shadow-md active:scale-95 transition-all">Submit Review</button>
-                </form>
+            {/* Header */}
+            <header className="px-6 flex justify-between items-center mb-8 sticky top-0 bg-[#050b18]/60 backdrop-blur-xl z-50 py-4">
+              <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 shadow-inner">
+                <ChevronLeft size={24}/>
               </div>
+              <h2 className="text-lg font-black uppercase tracking-[0.2em] italic">Popular Games</h2>
+              <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 shadow-inner">
+                <Bell size={24}/>
+              </div>
+            </header>
 
-              {/* REVIEWS LIST */}
-              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {reviews.map(rev => (
-                  <div key={rev.id} className="p-4 border-l-2 border-[#24cd77] bg-white dark:bg-white/5 rounded-r-xl shadow-sm">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] font-black uppercase text-[#24cd77]">{rev.user_name}</span>
-                      <span className="text-[8px]">{"⭐".repeat(rev.rating)}</span>
-                    </div>
-                    <p className="text-xs text-gray-500 italic font-medium leading-relaxed font-serif">"{rev.comment}"</p>
-                  </div>
+            {/* Search Bar */}
+            <div className="px-6 mb-8">
+               <div className="bg-white/5 border border-white/10 p-4 rounded-[1.5rem] flex items-center gap-4">
+                  <Search size={20} className="text-gray-500"/>
+                  <input type="text" placeholder="Search for your favorites..." className="bg-transparent border-none outline-none text-sm w-full" />
+                  <Filter size={20} className="text-blue-500"/>
+               </div>
+            </div>
+
+            {/* Poster Grid */}
+            <main className="px-6">
+              <div className="grid grid-cols-2 gap-6">
+                {apps.map((app) => (
+                  <Link href={`/apps/${app.id}`} key={app.id}>
+                    <motion.div whileHover={{ y: -10 }} className="poster-card group">
+                      <img src={app.icon_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={app.title} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent p-5 flex flex-col justify-end">
+                         <div className="bg-blue-600 w-fit px-2 py-0.5 rounded-lg text-[8px] font-black uppercase mb-2">NEW</div>
+                         <h3 className="font-black text-[16px] truncate uppercase leading-none mb-2">{app.title}</h3>
+                         <div className="flex items-center justify-between">
+                            <span className="text-[12px] font-bold text-blue-400 tracking-tighter">{app.price}</span>
+                            <div className="flex items-center gap-1">
+                               <Star size={10} className="fill-orange-400 text-orange-400"/>
+                               <span className="text-[10px] font-bold text-gray-300">4.9</span>
+                            </div>
+                         </div>
+                      </div>
+                    </motion.div>
+                  </Link>
                 ))}
               </div>
-            </div>
-        </div>
 
-        {/* PAYMENT MODAL */}
-        {showPayment && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
-            <div className="bg-white dark:bg-[#111] p-10 rounded-[3rem] max-w-sm w-full relative border border-[#24cd77]/30 text-center animate-in zoom-in-95 duration-300">
-              <button onClick={() => setShowPayment(false)} className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors">✕</button>
-              <h3 className="text-xl font-black uppercase mb-8 italic italic text-gray-800 dark:text-white">Orbit <span className="text-[#24cd77]">Payment</span></h3>
-              <div className="space-y-4 mb-8">
-                <div className="p-5 bg-gray-50 dark:bg-black/40 rounded-3xl border border-gray-100 dark:border-white/5 text-left italic">
-                  <p className="text-[9px] font-bold text-[#24cd77] uppercase mb-1 italic">NayaPay / JazzCash / Easypaisa</p>
-                  <p className="text-2xl font-black tracking-widest text-gray-800 dark:text-white">0327-5176283</p>
-                  <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase border-t border-gray-100 dark:border-white/5 pt-2">Salman Khan</p>
-                </div>
-                <div className="p-5 bg-gray-50 dark:bg-black/40 rounded-3xl border border-gray-100 dark:border-white/5 text-left italic">
-                  <p className="text-[9px] font-bold text-[#24cd77] uppercase mb-1 tracking-widest italic">NayaPay IBAN</p>
-                  <p className="text-[10px] font-bold dark:text-white text-gray-800 break-all font-mono italic">PK16 NAYA 1234 5032 7517 6283</p>
-                </div>
+              {/* LIST VIEW (Teesri Screen ka look) */}
+              <div className="mt-14 pb-10">
+                 <h3 className="text-xl font-black uppercase italic tracking-tighter mb-8 border-l-4 border-blue-600 pl-4">Top this year</h3>
+                 <div className="space-y-4">
+                    {apps.slice(0, 3).map(app => (
+                      <div key={app.id} className="bg-white/[0.03] p-5 rounded-[2.5rem] border border-white/5 flex items-center justify-between group hover:bg-white/5 transition-all">
+                         <div className="flex items-center gap-4">
+                            <img src={app.icon_url} className="w-16 h-16 rounded-2xl object-cover shadow-2xl border border-white/10" alt="" />
+                            <div>
+                               <h4 className="font-black text-[14px] uppercase italic tracking-tight">{app.title}</h4>
+                               <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{app.category}</p>
+                               <div className="flex items-center gap-1 mt-1 opacity-50">
+                                  <Star size={8} className="fill-orange-400 text-orange-400"/>
+                                  <span className="text-[8px] font-bold">4.8</span>
+                               </div>
+                            </div>
+                         </div>
+                         <Link href={`/apps/${app.id}`}>
+                           <button className="bg-white/5 text-white border border-white/10 px-8 py-2.5 rounded-full text-[10px] font-black uppercase hover:bg-blue-600 hover:border-blue-600 transition-all shadow-xl">Play</button>
+                         </Link>
+                      </div>
+                    ))}
+                 </div>
               </div>
-              <a href={`https://wa.me/923275176283?text=I paid for ${app.title} v${app.version}`} className="block bg-[#25D366] text-white font-black py-5 rounded-2xl uppercase text-[11px] tracking-widest shadow-xl shadow-green-500/20 active:scale-95 transition-all">Send Screenshot</a>
-              <p className="text-[9px] text-gray-500 mt-6 italic">Direct Google Drive link will be shared after verification.</p>
+            </main>
+
+            {/* --- THE EXACT SPATIAL BOTTOM NAV --- */}
+            <div className="spatial-nav">
+               <button className="text-gray-500"><LayoutGrid size={24}/></button>
+               <button className="text-gray-500"><Search size={24}/></button>
+               <button className="nav-item-active"><HomeIcon size={24}/></button>
+               <button className="text-gray-500"><Heart size={24}/></button>
+               <button className="text-gray-500"><MessageSquare size={24}/></button>
             </div>
-          </div>
+          </motion.div>
         )}
-      </main>
+      </AnimatePresence>
     </div>
   )
+}
+
+// Chota function for Chevron
+function ChevronLeft({size}) {
+  return <Star size={size} className="-rotate-90"/> // Placeholder if lucide not updated
 }
