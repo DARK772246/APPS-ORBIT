@@ -5,12 +5,13 @@ import InstallPrompt from '../components/InstallPrompt'
 import Script from 'next/script'
 import { MessageCircle } from 'lucide-react'
 
-// SEO aur PWA Metadata
+// SEO, Search Console aur PWA Metadata
 export const metadata = {
   title: 'Salman AppOrbit | Premium App Store',
   description: 'Verified Android Mods by Salman Khan. Fast, Secure, and Affordable.',
   manifest: '/manifest.json',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  googleSiteVerification: 'NhPDdeUA4e58lgelt3il5KTAcy-yNYUK88xRZlo8l9k', // Verification Link
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -37,7 +38,7 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
         />
 
-        {/* 4. PWA & Theme Settings */}
+        {/* 4. PWA & Theme Icons */}
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#24cd77" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
@@ -58,15 +59,15 @@ export default function RootLayout({ children }) {
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <div className="flex flex-col min-h-screen">
             
-            {/* Main Website Pages Content */}
+            {/* Main Page Body */}
             <main className="flex-grow">
               {children}
             </main>
             
-            {/* Floating Install App Prompt (PWA) */}
+            {/* PWA Install Banner */}
             <InstallPrompt />
 
-            {/* Professional Footer with Links */}
+            {/* Global Footer */}
             <Footer />
 
             {/* Floating WhatsApp Support Button */}
