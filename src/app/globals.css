@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --bg-dark: #050505;
+  --bg-dark: #020617;
   --primary: #2ea64d;
+  --accent: #4f46e5;
 }
 
 body {
@@ -12,32 +13,35 @@ body {
   overflow-x: hidden;
 }
 
-/* 1. ANIMATED BACKGROUND GRADIENT */
-.bg-animate {
-  background: radial-gradient(circle at 50% 50%, rgba(46, 166, 77, 0.05) 0%, transparent 50%),
-              radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.05) 0%, transparent 40%);
+/* LUXURY BACKGROUND MESH */
+.bg-aura {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(46, 166, 77, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(79, 70, 229, 0.08) 0%, transparent 40%);
   z-index: -1;
+  pointer-events: none;
 }
 
-/* 2. GLASS EFFECT FOR CARDS */
-.glass-card {
+/* SPATIAL GLASS CARD */
+.spatial-card {
   background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
-  transition: all 0.4s ease;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 32px;
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.glass-card:hover {
+.spatial-card:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: var(--primary);
-  transform: translateY(-8px) scale(1.01);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 20px rgba(46, 166, 77, 0.1);
 }
 
-/* 3. MARQUEE */
+/* NEWS TICKER ANIMATION */
 @keyframes marquee {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
@@ -45,10 +49,16 @@ body {
 .animate-marquee {
   display: inline-block;
   white-space: nowrap;
-  animation: marquee 30s linear infinite;
+  animation: marquee 35s linear infinite;
 }
 
-/* 4. CUSTOM SCROLLBAR */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0a0a0a; }
-::-webkit-scrollbar-thumb { background: #2ea64d; border-radius: 10px; }
+/* NEON BUTTON */
+.btn-neon {
+  background: var(--primary);
+  box-shadow: 0 0 20px rgba(46, 166, 77, 0.4);
+  transition: all 0.3s ease;
+}
+.btn-neon:hover {
+  box-shadow: 0 0 35px rgba(46, 166, 77, 0.6);
+  transform: scale(1.05);
+}
