@@ -6,30 +6,39 @@ import { Star, Download } from 'lucide-react';
 export default function AppCard({ app }) {
   return (
     <motion.div 
-      whileHover={{ y: -10 }}
-      className="min-w-[180px] md:min-w-[220px] group relative"
+      whileHover={{ y: -8 }}
+      className="w-[170px] md:w-[220px] flex-shrink-0"
     >
       <Link href={`/apps/${app.id}`}>
-        <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gray-100 dark:bg-[#111] border border-gray-200 dark:border-white/5 shadow-xl relative group">
-          {/* Image */}
-          <img src={app.icon_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100" alt="" />
+        <div className="aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-white dark:bg-[#111] border border-gray-100 dark:border-white/10 shadow-lg relative group">
           
-          {/* Overlay Info */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-6 flex flex-col justify-end translate-y-4 group-hover:translate-y-0 transition-transform">
-            <h3 className="text-white font-black uppercase italic tracking-tighter text-lg leading-none mb-2">{app.title}</h3>
+          {/* App Icon / Poster */}
+          {app.icon_url ? (
+            <img 
+              src={app.icon_url} 
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+              alt={app.title} 
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-4xl bg-gray-100 dark:bg-black/20">📱</div>
+          )}
+          
+          {/* Premium Badge */}
+          <div className="absolute top-4 left-4 z-10">
+            <span className="bg-[#2ea64d] text-white text-[8px] font-black px-2 py-1 rounded-lg shadow-lg uppercase tracking-widest">
+              {app.is_free ? 'Free' : 'Pro'}
+            </span>
+          </div>
+
+          {/* Bottom Info Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent p-5 flex flex-col justify-end">
+            <h3 className="text-white font-bold text-sm truncate uppercase leading-tight mb-1">{app.title}</h3>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
                 <Star size={10} className="fill-[#2ea64d] text-[#2ea64d]" />
-                <span className="text-[10px] font-bold text-white">4.9</span>
+                <span className="text-[10px] font-bold text-white/80">4.9</span>
               </div>
-              <span className="text-[10px] font-black text-[#2ea64d]">{app.price === "FREE" ? "MOD" : app.price}</span>
-            </div>
-          </div>
-
-          {/* Quick Download Button */}
-          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-10 h-10 bg-[#2ea64d] rounded-2xl flex items-center justify-center text-white shadow-lg">
-              <Download size={18} />
+              <span className="text-[10px] font-black text-[#2ea64d] tracking-tighter">{app.price === "FREE" ? "MOD" : app.price}</span>
             </div>
           </div>
         </div>
