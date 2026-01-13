@@ -1,47 +1,67 @@
 @import "tailwindcss";
 
 :root {
-  --bg-dark: #020617;
-  --primary: #2ea64d;
-  --accent: #4f46e5;
+  --bg-deep: #050b18;
+  --accent-blue: #3b82f6;
+  --nav-bg: #0f172a;
 }
 
 body {
-  background-color: var(--bg-dark);
-  color: #fff;
+  background-color: var(--bg-deep);
+  color: #ffffff;
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
 }
 
-/* LUXURY BACKGROUND MESH */
-.bg-aura {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: 
-    radial-gradient(circle at 0% 0%, rgba(46, 166, 77, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 100% 100%, rgba(79, 70, 229, 0.08) 0%, transparent 40%);
-  z-index: -1;
-  pointer-events: none;
-}
-
-/* SPATIAL GLASS CARD */
-.spatial-card {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+/* 1. 3D VERTICAL POSTER CARD */
+.poster-card {
+  aspect-ratio: 3/4.2;
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 32px;
   transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.spatial-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--primary);
+.poster-card:hover {
   transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 20px rgba(46, 166, 77, 0.1);
+  border-color: var(--accent-blue);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.6), 0 0 20px rgba(59, 130, 246, 0.2);
 }
 
-/* NEWS TICKER ANIMATION */
+/* 2. CONCAVE BOTTOM NAVIGATION (The Dribbble Look) */
+.spatial-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 85px;
+  background: var(--nav-bg);
+  clip-path: polygon(0 25%, 33% 25%, 50% 0%, 67% 25%, 100% 25%, 100% 100%, 0 100%);
+  backdrop-filter: blur(30px);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-top: 15px;
+  z-index: 100;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.nav-active-blob {
+  background: var(--accent-blue);
+  color: white;
+  width: 55px;
+  height: 55px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -55px; /* Floating icon */
+  box-shadow: 0 15px 30px rgba(59, 130, 246, 0.5);
+  border: 4px solid var(--bg-deep);
+}
+
+/* 3. MARQUEE (Still useful for News) */
 @keyframes marquee {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
@@ -52,13 +72,7 @@ body {
   animation: marquee 35s linear infinite;
 }
 
-/* NEON BUTTON */
-.btn-neon {
-  background: var(--primary);
-  box-shadow: 0 0 20px rgba(46, 166, 77, 0.4);
-  transition: all 0.3s ease;
-}
-.btn-neon:hover {
-  box-shadow: 0 0 35px rgba(46, 166, 77, 0.6);
-  transform: scale(1.05);
-}
+/* 4. CUSTOM SCROLLBAR */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 10px; }

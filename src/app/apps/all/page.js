@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../supabase';
 import Navbar from '../../../components/Navbar';
-import Footer from '../../../components/Footer';
 import AppCard from '../../../components/AppCard';
 import { ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react';
 
@@ -39,18 +38,18 @@ export default function AllAppsPage() {
   const totalPages = Math.ceil(totalCount / limit);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-500">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-500 pb-20">
       <Navbar />
       
-      <main className="max-w-7xl mx-auto px-6 pt-32 pb-20">
+      <main className="max-w-7xl mx-auto px-6 pt-32">
         <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-4 border-l-4 border-[#2ea64d] pl-6">
            <div>
-             <h1 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter">Orbit <span className="text-[#2ea64d]">Catalog</span></h1>
-             <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1 italic">Browsing {totalCount} total programs</p>
+             <h1 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter leading-none dark:text-white">Orbit <span className="text-[#2ea64d]">Catalog</span></h1>
+             <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1 italic">Total programs: {totalCount}</p>
            </div>
            <div className="bg-gray-100 dark:bg-white/5 p-3 rounded-2xl flex items-center gap-2">
               <LayoutGrid size={18} className="text-[#2ea64d]"/>
-              <span className="text-[10px] font-black uppercase tracking-widest">Global Filter Active</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 italic">Full Access Mode</span>
            </div>
         </div>
 
@@ -68,25 +67,23 @@ export default function AllAppsPage() {
               ))}
             </div>
 
-            {/* PAGINATION CONTROLS */}
+            {/* Pagination */}
             {totalPages > 1 && (
-              <div className="mt-20 flex justify-center items-center gap-6">
+              <div className="mt-20 flex justify-center items-center gap-6 pb-10">
                 <button 
                   disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
-                  className="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl disabled:opacity-20 hover:text-[#2ea64d] transition-all"
+                  className="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl disabled:opacity-20 hover:text-[#2ea64d] transition-all dark:text-white"
                 >
                   <ChevronLeft size={24}/>
                 </button>
-                
                 <span className="text-sm font-black uppercase tracking-widest italic text-gray-500">
                   Page <span className="text-[#2ea64d]">{page}</span> of {totalPages}
                 </span>
-
                 <button 
                   disabled={page === totalPages}
                   onClick={() => setPage(p => p + 1)}
-                  className="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl disabled:opacity-20 hover:text-[#2ea64d] transition-all"
+                  className="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl disabled:opacity-20 hover:text-[#2ea64d] transition-all dark:text-white"
                 >
                   <ChevronRight size={24}/>
                 </button>
@@ -95,7 +92,7 @@ export default function AllAppsPage() {
           </>
         )}
       </main>
-      <Footer />
+      {/* NO FOOTER HERE ANYMORE */}
     </div>
   );
 }

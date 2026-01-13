@@ -3,12 +3,6 @@ import { ThemeProvider } from '../components/ThemeProvider'
 import Footer from '../components/Footer'
 import InstallPrompt from '../components/InstallPrompt'
 
-export const metadata = {
-  title: 'Salman AppOrbit | Premium App Store',
-  description: 'Verified Android Mods by Salman Khan. Safe and Fast.',
-  manifest: '/manifest.json',
-}
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -19,6 +13,7 @@ export default function RootLayout({ children }) {
               {children}
             </main>
             <InstallPrompt />
+            {/* AIK HI GLOBAL FOOTER */}
             <Footer />
           </div>
         </ThemeProvider>
