@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Home as HomeIcon, Gamepad2, LayoutGrid, HelpCircle, Search, X, Globe, Star, 
   Flame, CheckCircle, Clock, ArrowDownToLine, Smartphone, Zap, Mail, ShieldCheck, 
-  Instagram, Music, PenTool, Image as ImageIcon, BellRing, DownloadCloud, ArrowUp
+  Instagram, Music, PenTool, Image as ImageIcon, BellRing, DownloadCloud, ArrowUp, Trophy
 } from 'lucide-react'
 import ThemeToggle from '../components/ThemeToggle'
 import Navbar from '../components/Navbar'
@@ -45,17 +45,26 @@ export default function Home() {
     setLoading(false)
   }
 
-  // Live filtering of apps
+  // Live filtering logic
   const filteredApps = apps.filter(app => app.title.toLowerCase().includes(searchTerm.toLowerCase()));
   const trending = filteredApps.filter(a => a.category === 'App').slice(0, 8);
   const gaming = filteredApps.filter(a => a.category === 'Game').slice(0, 8);
+
+  const toggleWishlist = (e, id) => {
+    e.preventDefault()
+    let favs = JSON.parse(localStorage.getItem('wishlist') || '[]')
+    if (favs.includes(id)) favs = favs.filter(i => i !== id)
+    else favs.push(id)
+    localStorage.setItem('wishlist', JSON.stringify(favs))
+    setWishlist(favs)
+  }
 
   if (!mounted) return null
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#0a0a0a] transition-colors duration-300 font-sans pb-20">
       
-      {/* 1. NAVBAR - onSearch logic is passed here */}
+      {/* 1. NAVBAR */}
       <Navbar onSearch={setSearchTerm} />
       
       <main className="pt-16">
@@ -83,8 +92,8 @@ export default function Home() {
 
           {/* 4. LATEST SYNC SECTION */}
           <section id="latest">
-            <div className="flex items-center justify-between mb-10 border-l-4 border-[#2ea64d] pl-6">
-              <h2 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter flex items-center gap-2 text-[#2ea64d] leading-none">
+            <div className="flex items-center justify-between mb-10 border-l-4 border-[#2ea64d] pl-6 leading-none">
+              <h2 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter flex items-center gap-2 text-[#2ea64d]">
                 <Zap /> Latest Orbit Sync
               </h2>
             </div>
@@ -93,9 +102,9 @@ export default function Home() {
 
           {/* 5. PRO GAMING SECTION */}
           <section id="games">
-            <div className="flex items-center justify-between mb-10 border-l-4 border-blue-500 pl-6">
-              <h2 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter flex items-center gap-2 text-blue-500 leading-none">
-                <Star /> Pro Gaming
+            <div className="flex items-center justify-between mb-10 border-l-4 border-blue-500 pl-6 leading-none">
+              <h2 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter flex items-center gap-2 text-blue-500">
+                <Trophy size={24} /> Pro Gaming
               </h2>
               <Link href="/apps/all">
                 <button className="text-[10px] font-black uppercase text-blue-500 border border-blue-500/20 px-6 py-2.5 rounded-full hover:bg-blue-500 hover:text-white transition-all shadow-lg active:scale-95 italic tracking-widest">
@@ -119,7 +128,7 @@ export default function Home() {
              </div>
           </section>
 
-          {/* 7. BLOG FEED (6 ARTICLES) */}
+          {/* 7. BLOG FEED */}
           <section>
             <h2 className="text-2xl font-black uppercase italic mb-10 border-l-4 border-orange-500 pl-4 dark:text-white text-gray-800 italic leading-none">Orbit Tech Insights</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -131,10 +140,10 @@ export default function Home() {
                     ) : (
                       <ImageIcon size={40} className="opacity-10 text-gray-400" />
                     )}
-                    <div className="absolute bottom-2 left-2 bg-orange-500 text-white text-[7px] font-black px-2 py-0.5 rounded shadow-lg uppercase tracking-widest">Read More</div>
+                    <div className="absolute bottom-2 left-2 bg-orange-500 text-white text-[7px] font-black px-3 py-1 rounded shadow-lg uppercase tracking-widest">Read Article</div>
                   </div>
-                  <div className="px-2 pb-2 flex-grow">
-                    <p className="text-[9px] font-black text-orange-500 uppercase mb-2 flex items-center gap-1"><PenTool size={10}/> By {art.author}</p>
+                  <div className="p-2">
+                    <p className="text-[9px] font-black text-orange-500 uppercase mb-2 flex items-center gap-1"><PenTool size={10}/> {art.author}</p>
                     <h3 className="text-[15px] font-black leading-tight uppercase group-hover:text-[#2ea64d] transition-colors line-clamp-2 italic dark:text-gray-100 text-gray-800 leading-none">{art.title}</h3>
                   </div>
                 </Link>
@@ -156,5 +165,3 @@ export default function Home() {
     </div>
   )
 }
-
-function ArrowUp({size}) { return <Star size={size} className="-rotate-90"/> }
