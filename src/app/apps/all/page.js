@@ -3,14 +3,15 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../../supabase';
 import Navbar from '../../../components/Navbar';
 import AppCard from '../../../components/AppCard';
-import { ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react';
+import { ChevronLeft, ChevronRight, LayoutGrid, Loader2 } from 'lucide-react';
 
 export default function AllAppsPage() {
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const limit = 20;
+  const [searchTerm, setSearchTerm] = useState('');
+  const limit = 24; // 6 columns ke hisab se 24 best hai
 
   useEffect(() => {
     fetchData();
@@ -35,64 +36,66 @@ export default function AllAppsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  const filtered = apps.filter(app => app.title.toLowerCase().includes(searchTerm.toLowerCase()));
   const totalPages = Math.ceil(totalCount / limit);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-500 pb-20">
-      <Navbar />
+    <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#0a0a0a] transition-colors duration-500 pb-20 font-sans">
+      <Navbar onSearch={setSearchTerm} />
       
-      <main className="max-w-7xl mx-auto px-6 pt-32">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-4 border-l-4 border-[#2ea64d] pl-6">
+      <main className="max-w-7xl mx-auto px-4 pt-24 md:pt-32">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-4 border-l-4 border-[#2ea64d] pl-6">
            <div>
-             <h1 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter leading-none dark:text-white">Orbit <span className="text-[#2ea64d]">Catalog</span></h1>
+             <h1 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter dark:text-white text-gray-800">Orbit <span className="text-[#2ea64d]">Catalog</span></h1>
              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1 italic">Total programs: {totalCount}</p>
            </div>
-           <div className="bg-gray-100 dark:bg-white/5 p-3 rounded-2xl flex items-center gap-2">
+           <div className="hidden md:flex bg-gray-100 dark:bg-white/5 p-3 rounded-2xl items-center gap-2">
               <LayoutGrid size={18} className="text-[#2ea64d]"/>
-              <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 italic">Full Access Mode</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Full Access Mode</span>
            </div>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-             {[...Array(10)].map((_, i) => (
-               <div key={i} className="aspect-[4/5] bg-gray-200 dark:bg-white/5 rounded-[2.5rem] animate-pulse" />
-             ))}
+          <div className="flex justify-center py-40">
+            <Loader2 className="animate-spin text-[#2ea64d]" size={40} />
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {apps.map(app => (
+            {/* --- FIXED RESPONSIVE GRID --- */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+              {filtered.map(app => (
                 <AppCard key={app.id} app={app} />
               ))}
             </div>
 
-            {/* Pagination */}
+            {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="mt-20 flex justify-center items-center gap-6 pb-10">
+              <div className="mt-20 flex justify-center items-center gap-6">
                 <button 
                   disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
-                  className="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl disabled:opacity-20 hover:text-[#2ea64d] transition-all dark:text-white"
+                  className="p-4 bg-white dark:bg-[#111] rounded-2xl disabled:opacity-20 shadow-sm border dark:border-white/5 transition-all"
                 >
-                  <ChevronLeft size={24}/>
+                  <ChevronLeft size={20} className="dark:text-white text-gray-800"/>
                 </button>
-                <span className="text-sm font-black uppercase tracking-widest italic text-gray-500">
+                
+                <span className="text-xs font-black uppercase tracking-widest italic text-gray-500">
                   Page <span className="text-[#2ea64d]">{page}</span> of {totalPages}
                 </span>
+
                 <button 
                   disabled={page === totalPages}
                   onClick={() => setPage(p => p + 1)}
-                  className="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl disabled:opacity-20 hover:text-[#2ea64d] transition-all dark:text-white"
+                  className="p-4 bg-white dark:bg-[#111] rounded-2xl disabled:opacity-20 shadow-sm border dark:border-white/5 transition-all"
                 >
-                  <ChevronRight size={24}/>
+                  <ChevronRight size={20} className="dark:text-white text-gray-800"/>
                 </button>
               </div>
             )}
           </>
         )}
       </main>
-      {/* NO FOOTER HERE ANYMORE */}
     </div>
   );
 }
