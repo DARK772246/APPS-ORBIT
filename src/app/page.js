@@ -20,90 +20,141 @@ export default function Home() {
   const [userRequests, setUserRequests] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeTab, setActiveTab] = useState('Home')
   const [mounted, setMounted] = useState(false)
+  const [wishlist, setWishlist] = useState([])
 
   useEffect(() => {
     setMounted(true)
     fetchData()
+    const saved = JSON.parse(localStorage.getItem('wishlist') || '[]')
+    setWishlist(saved)
   }, [])
 
   async function fetchData() {
     try {
       const { data: a } = await supabase.from('apps').select('*').order('created_at', { ascending: false })
-      const { data: s } = await supabase.from('featured_slides').select('*').order('id', { ascending: false })
+      const { data: s } = await supabase.from('featured_slides').select('*')
       const { data: art } = await supabase.from('articles').select('*').order('created_at', { ascending: false }).limit(6)
       const { data: r } = await supabase.from('requests').select('*').order('created_at', { ascending: false }).limit(6)
-      if (a) setApps(a); if (s) setSlides(s); if (art) setArticles(art); if (r) setUserRequests(r);
+      
+      if (a) setApps(a);
+      if (s) setSlides(s);
+      if (art) setArticles(art);
+      if (r) setUserRequests(r);
     } catch (err) { console.error(err) }
     setLoading(false)
   }
 
-  const filtered = apps.filter(app => app.title.toLowerCase().includes(searchTerm.toLowerCase()))
-  const trending = filtered.filter(a => (a.category === 'App' || a.category === 'Programs')).slice(0, 8)
-  const gaming = filtered.filter(a => a.category === 'Game').slice(0, 8)
+  // Live filtering of apps
+  const filteredApps = apps.filter(app => app.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  const trending = filteredApps.filter(a => a.category === 'App').slice(0, 8);
+  const gaming = filteredApps.filter(a => a.category === 'Game').slice(0, 8);
 
   if (!mounted) return null
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#0a0a0a] transition-colors duration-300 font-sans pb-20">
+      
+      {/* 1. NAVBAR - onSearch logic is passed here */}
       <Navbar onSearch={setSearchTerm} />
       
       <main className="pt-16">
+        {/* 2. DYNAMIC SLIDER */}
         <HeroSlider slides={slides} />
 
-        <div className="max-w-7xl mx-auto px-6 space-y-24 py-20 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 space-y-24 py-16 relative z-10">
           
-          {/* TRENDING */}
+          {/* 3. TRENDING SECTION */}
           <section id="apps">
             <div className="flex items-center justify-between mb-10 border-l-4 border-orange-500 pl-6">
-              <h2 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-2 text-orange-500 leading-none">
-                <Flame className="animate-pulse" /> Trending Now
-              </h2>
-              <Link href="/apps/all" className="text-[10px] font-bold uppercase text-gray-500 hover:text-orange-500 px-4 py-2 rounded-full border dark:border-white/5 transition-all">Show More</Link>
+              <div>
+                <h2 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter flex items-center gap-2 text-orange-500 leading-none">
+                  <Flame className="animate-pulse" /> Trending Now
+                </h2>
+              </div>
+              <Link href="/apps/all">
+                <button className="text-[10px] font-black uppercase text-orange-500 border border-orange-500/20 px-6 py-2.5 rounded-full hover:bg-orange-500 hover:text-white transition-all shadow-lg active:scale-95 italic tracking-widest">
+                  Show All Orbit
+                </button>
+              </Link>
             </div>
             <AppSlider apps={trending} loading={loading} />
           </section>
 
-          {/* LATEST */}
-          <section>
-            <div className="flex items-center justify-between mb-10 border-l-4 border-[#2ea64d] pl-6 leading-none">
-              <h2 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-2 text-[#2ea64d]">
+          {/* 4. LATEST SYNC SECTION */}
+          <section id="latest">
+            <div className="flex items-center justify-between mb-10 border-l-4 border-[#2ea64d] pl-6">
+              <h2 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter flex items-center gap-2 text-[#2ea64d] leading-none">
                 <Zap /> Latest Orbit Sync
               </h2>
             </div>
-            <AppSlider apps={filtered.slice(0, 8)} loading={loading} />
+            <AppSlider apps={filteredApps.slice(0, 8)} loading={loading} />
           </section>
 
-          {/* GAMING */}
+          {/* 5. PRO GAMING SECTION */}
           <section id="games">
-            <div className="flex items-center justify-between mb-10 border-l-4 border-blue-500 pl-6 leading-none">
-              <h2 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-2 text-blue-500">
-                <Trophy size={24} /> Pro Gaming
+            <div className="flex items-center justify-between mb-10 border-l-4 border-blue-500 pl-6">
+              <h2 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter flex items-center gap-2 text-blue-500 leading-none">
+                <Star /> Pro Gaming
               </h2>
-              <Link href="/apps/all" className="text-[10px] font-bold uppercase text-gray-500 hover:text-blue-500 px-4 py-2 rounded-full border dark:border-white/5 transition-all">Show More</Link>
+              <Link href="/apps/all">
+                <button className="text-[10px] font-black uppercase text-blue-500 border border-blue-500/20 px-6 py-2.5 rounded-full hover:bg-blue-500 hover:text-white transition-all shadow-lg active:scale-95 italic tracking-widest">
+                  View All Games
+                </button>
+              </Link>
             </div>
             <AppSlider apps={gaming} loading={loading} />
           </section>
 
-          {/* BLOG SECTION */}
+          {/* 6. REQUEST STATUS */}
+          <section className="bg-white dark:bg-[#111] rounded-[2.5rem] p-8 border border-gray-100 dark:border-white/5 mb-24 shadow-sm">
+             <h2 className="text-xl font-black uppercase italic tracking-tighter mb-8 border-l-4 border-blue-500 pl-4 dark:text-white leading-none">Community Tracker</h2>
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 italic font-medium">
+                {userRequests.map((req, i) => (
+                  <div key={i} className="p-4 bg-gray-50 dark:bg-black/30 rounded-2xl border dark:border-white/5 flex justify-between items-center italic transition-all hover:bg-white dark:hover:bg-black/50 shadow-sm">
+                     <div><p className="text-[11px] font-black uppercase dark:text-white truncate max-w-[150px] italic">{req.app_name}</p><p className="text-[8px] text-gray-400 uppercase font-bold mt-1">Status: {req.status || 'Checking'}</p></div>
+                     <div className={`w-2.5 h-2.5 rounded-full ${req.status?.toLowerCase().includes('added') ? 'bg-green-500 animate-pulse' : 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]'}`} />
+                  </div>
+                ))}
+             </div>
+          </section>
+
+          {/* 7. BLOG FEED (6 ARTICLES) */}
           <section>
-            <h2 className="text-2xl font-black uppercase italic mb-12 border-l-4 border-orange-500 pl-4 dark:text-white">Orbit Tech Insights</h2>
+            <h2 className="text-2xl font-black uppercase italic mb-10 border-l-4 border-orange-500 pl-4 dark:text-white text-gray-800 italic leading-none">Orbit Tech Insights</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {articles.map(art => (
-                <Link key={art.id} href={`/blog/${art.slug}`} className="group bg-white dark:bg-[#111] p-4 rounded-3xl border dark:border-white/5 shadow-sm hover:shadow-xl transition-all">
-                  <div className="w-full aspect-video rounded-2xl overflow-hidden mb-4 relative bg-black/20 flex items-center justify-center">
-                    {art.image_url ? <img src={art.image_url} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700" /> : <ImageIcon className="opacity-10" />}
+                <Link key={art.id} href={`/blog/${art.slug}`} className="group bg-white dark:bg-[#111] p-3 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all flex flex-col">
+                  <div className="w-full aspect-video rounded-3xl overflow-hidden mb-4 relative bg-gray-100 dark:bg-black/20 border dark:border-white/5 flex items-center justify-center">
+                    {art.image_url ? (
+                      <img src={art.image_url} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={art.title} loading="lazy" />
+                    ) : (
+                      <ImageIcon size={40} className="opacity-10 text-gray-400" />
+                    )}
+                    <div className="absolute bottom-2 left-2 bg-orange-500 text-white text-[7px] font-black px-2 py-0.5 rounded shadow-lg uppercase tracking-widest">Read More</div>
                   </div>
-                  <h3 className="text-lg font-black uppercase group-hover:text-[#2ea64d] leading-tight italic line-clamp-2 dark:text-white">{art.title}</h3>
+                  <div className="px-2 pb-2 flex-grow">
+                    <p className="text-[9px] font-black text-orange-500 uppercase mb-2 flex items-center gap-1"><PenTool size={10}/> By {art.author}</p>
+                    <h3 className="text-[15px] font-black leading-tight uppercase group-hover:text-[#2ea64d] transition-colors line-clamp-2 italic dark:text-gray-100 text-gray-800 leading-none">{art.title}</h3>
+                  </div>
                 </Link>
               ))}
             </div>
           </section>
+
         </div>
       </main>
+
+      {/* 8. SCROLL TO TOP */}
+      <button 
+        onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+        className="fixed bottom-24 left-6 bg-white dark:bg-[#1e1e1e] p-3 rounded-full shadow-2xl border border-gray-200 dark:border-white/5 text-gray-500 hover:text-[#2ea64d] transition-all z-50 shadow-blue-500/10"
+      >
+        <ArrowUp size={20}/>
+      </button>
+
     </div>
   )
 }
 
-function Trophy({size}) { return <Star size={size} className="text-blue-500" /> }
+function ArrowUp({size}) { return <Star size={size} className="-rotate-90"/> }
