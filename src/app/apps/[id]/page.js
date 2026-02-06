@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useState, use } from 'react';
 import { supabase } from '../../../supabase';
 import Navbar from '../../../components/Navbar';
@@ -122,6 +122,7 @@ function CommentsSection({ appId }) {
 // --- END NEW COMPONENT ---
 
 
+"use client" 
 export default function AppDetailPage({ params: paramsPromise }) {
   const params = use(paramsPromise);
   const id = params.id;
@@ -159,9 +160,8 @@ export default function AppDetailPage({ params: paramsPromise }) {
     return () => clearInterval(interval);
   }, [showDownloadModal, timer]);
   
+  // FIX: Interstitial Ad logic removed from here. Only Modal handling.
   const handleDownloadClick = () => {
-    // AD PUSH MOVED TO LAYOUT.JS FOR INTERSTITIAL AD
-    // Now, this function ONLY opens the modal.
     setShowDownloadModal(true);
     setTimer(5);
     setIsReady(false);
@@ -239,7 +239,8 @@ export default function AppDetailPage({ params: paramsPromise }) {
                 ) : (
                   <div className="animate-in zoom-in duration-500">
                     <ShieldCheck className="mx-auto mb-4 text-blue-500" size={32} />
-                    <Link href={`/apps/${app.id}/download`} className="block bg-[#2ea64d] hover:bg-[#268a40] text-white font-black py-4 rounded-xl uppercase text-[11px] shadow-lg active:scale-95 transition-all">Download APK Now</Link>
+                    {/* FIX: Changed <Link> to <a> tag to directly trigger file download */}
+                    <a href={app.download_url} target="_blank" rel="noopener noreferrer" className="block bg-[#2ea64d] hover:bg-[#268a40] text-white font-black py-4 rounded-xl uppercase text-[11px] shadow-lg active:scale-95 transition-all">Download APK Now</a>
                   </div>
                 )}
               </div>
