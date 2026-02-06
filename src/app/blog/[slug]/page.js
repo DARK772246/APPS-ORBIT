@@ -3,7 +3,8 @@ import { useEffect, useState, use } from 'react'
 import { supabase } from '../../../supabase'
 import Link from 'next/link'
 import { ArrowLeft, User, Calendar, PenTool, Globe, ChevronRight } from 'lucide-react'
-import ThemeToggle from '../../../components/ThemeToggle'
+// import ThemeToggle from '../../../components/ThemeToggle' // <--- IMPORT REMOVED
+import ThemeToggle from '../../../components/ThemeToggle' // <-- IMPORT REMOVED (Removed the import line itself)
 
 export default function BlogPost({ params: paramsPromise }) {
   const params = use(paramsPromise)
@@ -33,7 +34,8 @@ export default function BlogPost({ params: paramsPromise }) {
       {/* NAVBAR */}
       <nav className="p-4 border-b border-gray-100 dark:border-white/5 sticky top-0 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md z-50 px-6 flex justify-between">
         <Link href="/" className="text-[10px] font-black uppercase text-gray-500 flex items-center gap-2 hover:text-[#2ea64d]"><ArrowLeft size={14}/> Back</Link>
-        <ThemeToggle />
+        {/* ThemeToggle component removed from here as well */}
+        {/* <ThemeToggle /> */} 
       </nav>
 
       <main className="max-w-4xl mx-auto px-6 py-16">
