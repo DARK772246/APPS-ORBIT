@@ -4,7 +4,6 @@ import { supabase } from '../../../supabase'
 import Link from 'next/link'
 import { ArrowLeft, User, Calendar, PenTool, Globe, ChevronRight } from 'lucide-react'
 // import ThemeToggle from '../../../components/ThemeToggle' // <--- IMPORT REMOVED
-import ThemeToggle from '../../../components/ThemeToggle' // <-- IMPORT REMOVED (Removed the import line itself)
 
 export default function BlogPost({ params: paramsPromise }) {
   const params = use(paramsPromise)
