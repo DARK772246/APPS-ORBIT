@@ -1,4 +1,4 @@
-"use client" // <--- MUST BE THE VERY FIRST THING IN THE FILE
+"use client"
 import { useEffect, useState, use } from 'react';
 import { supabase } from '../../../supabase';
 import Navbar from '../../../components/Navbar';
@@ -9,8 +9,6 @@ import {
   CheckCircle, Info, Share2, Zap, ArrowLeft, Copy, Send, Trash2
 } from 'lucide-react';
 import Link from 'next/link';
-
-// --- SEO METADATA REMOVED (Because this is a client component) ---
 
 // --- NEW COMPONENT: Comments Form & List ---
 function CommentsSection({ appId }) {
@@ -122,6 +120,7 @@ function CommentsSection({ appId }) {
 // --- END NEW COMPONENT ---
 
 
+// --- Main Component Starts Here ---
 export default function AppDetailPage({ params: paramsPromise }) {
   const params = use(paramsPromise);
   const id = params.id;
@@ -159,22 +158,11 @@ export default function AppDetailPage({ params: paramsPromise }) {
     return () => clearInterval(interval);
   }, [showDownloadModal, timer]);
   
+  // FIX: Ad Push removed. Now it only opens the modal.
   const handleDownloadClick = () => {
-    if (window.adsbygoogle && typeof window.adsbygoogle.push === 'function') {
-        window.adsbygoogle.push({
-            google_ad_client: "ca-pub-6036065566084740",
-            enable_single_request: true,
-            page_url: window.location.href
-        }, () => {
-            setShowDownloadModal(true);
-            setTimer(5);
-            setIsReady(false);
-        });
-    } else {
-        setShowDownloadModal(true);
-        setTimer(5);
-        setIsReady(false);
-    }
+    setShowDownloadModal(true);
+    setTimer(5);
+    setIsReady(false);
   };
 
   if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-[#2ea64d] animate-pulse font-black uppercase tracking-[0.5em]">Syncing Orbit...</div>;
@@ -261,4 +249,4 @@ export default function AppDetailPage({ params: paramsPromise }) {
       </AnimatePresence>
     </div>
   );
-}
+          }
