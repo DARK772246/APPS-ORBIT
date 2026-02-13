@@ -5,8 +5,15 @@ import Link from 'next/link'
 import { 
   Upload, Trash2, Edit, Package, Activity, Lock, Settings, BarChart3, 
   Star, PenTool, Image as ImageIcon, LogOut, Layout, AlertTriangle, 
-  Smartphone, CheckCircle2, Search, PlusCircle, X, Link as LinkIcon, MessageSquareText
+  Smartphone, CheckCircle2, Search, PlusCircle, X, Link as LinkIcon, MessageSquareText,
+  Github
 } from 'lucide-react'
+
+// --- GITHUB CONFIGURATION (FAST DOWNLOADS) ---
+// Yahan apna GitHub Token aur Repo Name dalein
+const GITHUB_TOKEN = "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"; // e.g., ghp_xxxxxxxxxxxx
+const GITHUB_REPO = "DARK772246/APPS-ORBIT";   // Aapka Repo Name
+// ---------------------------------------------
 
 export default function AdminPortal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -14,6 +21,7 @@ export default function AdminPortal() {
   const [passwordInput, setPasswordInput] = useState('')
   const [dbPassword, setDbPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0) // New: Progress Bar
   const [adminSearch, setAdminSearch] = useState('')
   
   // Data States
@@ -25,29 +33,24 @@ export default function AdminPortal() {
   const [stats, setStats] = useState({ apps: 0, requests: 0, reports: 0, comments: 0 })
   const [message, setMessage] = useState({ text: '', type: '' })
 
-  // Security Settings State
+  // Security Settings
   const [showSettings, setShowSettings] = useState(false)
   const [newPassword, setNewPassword] = useState('')
 
-  // App Form State (Developer Field Added back)
+  // App Form State
   const [isFree, setIsFree] = useState(false)
   const [formData, setFormData] = useState({ 
     id: null, title: '', description: '', category: 'App', developer: 'Salman Khan', 
     price: '', original_price: '', download_url: '', icon_url: '', version: '1.0.0', 
-    size: '', min_android: '8.0+', whats_new: '', screenshots: [] 
+    size: '', min_android: '8.0+', whats_new: '', screenshots: [], 
+    file_type: 'APK', is_trending: false, is_latest: true, is_pro_gaming: false 
   })
 
   // Slider & Blog States
   const [slideData, setSlideData] = useState({ id: null, title: '', description: '', image_url: '', button_link: '', bg_color: 'bg-[#2ea64d]' })
   const [artData, setArtData] = useState({ id: null, title: '', content: '', author: 'Salman Khan', writer: 'Salman AppOrbit', image_url: '' })
 
-  useEffect(() => { 
-    fetchAuth();
-    // NEW: Check if already logged in via session
-    if (sessionStorage.getItem('admin_token') === 'SALMAN_ORBIT_ADMIN') {
-        setIsLoggedIn(true);
-    }
-  }, [])
+  useEffect(() => { fetchAuth() }, [])
   useEffect(() => { if (isLoggedIn) fetchData() }, [isLoggedIn])
 
   async function fetchAuth() {
@@ -56,26 +59,26 @@ export default function AdminPortal() {
       if (data) setDbPassword(data.setting_value)
       else setDbPassword('salman786')
     } catch (e) { setDbPassword('salman786') }
+    if (sessionStorage.getItem('admin_token') === 'SALMAN_ORBIT_ADMIN') setIsLoggedIn(true);
   }
 
   async function handleLogin() {
     if (passwordInput === dbPassword) {
         setIsLoggedIn(true);
-        sessionStorage.setItem('admin_token', 'SALMAN_ORBIT_ADMIN'); // NEW: Save token to session
+        sessionStorage.setItem('admin_token', 'SALMAN_ORBIT_ADMIN');
     } else {
-        alert("Invalid Code!");
+        alert("Invalid Code!")
     }
   }
 
   function handleLogout() {
     setIsLoggedIn(false);
-    sessionStorage.removeItem('admin_token'); // NEW: Remove token on logout
+    sessionStorage.removeItem('admin_token');
     setView('dashboard');
   }
 
   async function fetchData() {
     setLoading(true)
-    // ... (rest of fetchData logic remains the same)
     try {
       const { data: a } = await supabase.from('apps').select('*').order('created_at', { ascending: false })
       const { data: s } = await supabase.from('featured_slides').select('*').order('id', { ascending: false })
@@ -91,6 +94,100 @@ export default function AdminPortal() {
     setLoading(false)
   }
 
+  // --- NEW: GITHUB UPLOAD FUNCTION (THE FAST WAY) ---
+  const uploadToGitHub = async (file) => {
+    if (!GITHUB_TOKEN || GITHUB_TOKEN === "YOUR_GITHUB_TOKEN_HERE") {
+        alert("GitHub Token not set in code!");
+        return null;
+    }
+    
+    setUploadProgress(10);
+    const tagName = `v${Date.now()}`;
+    const fileName = file.name.replace(/\s/g, '_');
+
+    try {
+        // 1. Create Release
+        const releaseRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/vnd.github.v3+json'
+            },
+            body: JSON.stringify({
+                tag_name: tagName,
+                name: `Release ${tagName}`,
+                body: "Uploaded via Orbit Admin Panel"
+            })
+        });
+        
+        if (!releaseRes.ok) throw new Error("Failed to create GitHub Release");
+        const releaseData = await releaseRes.json();
+        const uploadUrl = releaseData.upload_url.split('{')[0];
+
+        setUploadProgress(30);
+
+        // 2. Upload File to Release
+        const fileUploadRes = await fetch(`${uploadUrl}?name=${fileName}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Content-Type': file.type || 'application/octet-stream',
+            },
+            body: file
+        });
+
+        if (!fileUploadRes.ok) throw new Error("Failed to upload file to GitHub");
+        
+        setUploadProgress(100);
+        const fileData = await fileUploadRes.json();
+        
+        // Return the Fast Download URL
+        return fileData.browser_download_url;
+
+    } catch (error) {
+        console.error("GitHub Upload Error:", error);
+        alert(`Upload Failed: ${error.message}`);
+        setUploadProgress(0);
+        return null;
+    }
+  };
+  // ------------------------------------------------
+
+  const handleFileUpload = async (e, bucket, mode) => {
+    const file = e.target.files[0]; if (!file) return;
+    setLoading(true);
+    setUploadProgress(0);
+
+    // LOGIC: Agar APK hai, toh GitHub pe daalo (Fast). Agar Icon hai, toh Supabase pe (Simple).
+    if (mode === 'apk') {
+        const githubUrl = await uploadToGitHub(file);
+        if (githubUrl) {
+            setFormData(prev => ({...prev, download_url: githubUrl}));
+            alert("File Uploaded to GitHub! (Fast Speed) 🚀");
+        }
+    } else {
+        // Normal Supabase Upload for Images/Icons
+        const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
+        const { error } = await supabase.storage.from(bucket).upload(fileName, file);
+        
+        if (!error) {
+            const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
+            const url = data.publicUrl;
+            if (mode === 'icon') setFormData(prev => ({...prev, icon_url: url}));
+            if (mode === 'slide') setSlideData(prev => ({...prev, image_url: url}));
+            if (mode === 'blog') setArtData(prev => ({...prev, image_url: url}));
+            if (mode === 'screenshot') setFormData(prev => ({...prev, screenshots: [...(prev.screenshots || []), url]}));
+            alert("Image Uploaded! ✅");
+        } else {
+            alert(error.message);
+        }
+    }
+    setLoading(false);
+    setUploadProgress(0);
+  }
+
+  // ... (Rest of the functions: handleCommentAction, handleSaveApp, etc. remain the same)
   const handleCommentAction = async (id, action) => {
     setLoading(true);
     let res;
@@ -99,7 +196,6 @@ export default function AdminPortal() {
     } else if (action === 'delete') {
       res = await supabase.from('comments').delete().eq('id', id);
     }
-    
     if (!res?.error) { 
       setMessage({text: `Comment ${action === 'approve' ? 'Approved' : 'Deleted'}!`, type:'success'}); 
       fetchData(); 
@@ -109,28 +205,7 @@ export default function AdminPortal() {
     setLoading(false);
   }
 
-  const handleFileUpload = async (e, bucket, mode) => {
-    // ... (existing handleFileUpload logic)
-    const file = e.target.files[0]; if (!file) return;
-    setLoading(true)
-    const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`
-    const { error } = await supabase.storage.from(bucket).upload(fileName, file)
-    
-    if (!error) {
-      const { data } = supabase.storage.from(bucket).getPublicUrl(fileName)
-      const url = data.publicUrl
-      if (mode === 'icon') setFormData(prev => ({...prev, icon_url: url}))
-      if (mode === 'apk') setFormData(prev => ({...prev, download_url: url}))
-      if (mode === 'slide') setSlideData(prev => ({...prev, image_url: url}))
-      if (mode === 'blog') setArtData(prev => ({...prev, image_url: url}))
-      if (mode === 'screenshot') setFormData(prev => ({...prev, screenshots: [...(prev.screenshots || []), url]}))
-      alert("Asset Synced! ✅")
-    } else { alert(error.message) }
-    setLoading(false)
-  }
-
   const handleSaveApp = async (e) => {
-    // ... (existing handleSaveApp logic)
     e.preventDefault(); setLoading(true)
     const { id, ...dataToInsert } = formData
     const finalData = { ...dataToInsert, price: isFree ? 'FREE' : formData.price, is_free: isFree, original_price: isFree ? '0' : formData.original_price }
@@ -140,7 +215,6 @@ export default function AdminPortal() {
   }
 
   const handleSaveSlide = async (e) => {
-    // ... (existing handleSaveSlide logic)
     e.preventDefault(); setLoading(true)
     const { id, ...data } = slideData
     const res = slideData.id ? await supabase.from('featured_slides').update(data).eq('id', id) : await supabase.from('featured_slides').insert([data])
@@ -149,7 +223,6 @@ export default function AdminPortal() {
   }
 
   const handleSaveArticle = async (e) => {
-    // ... (existing handleSaveArticle logic)
     e.preventDefault(); setLoading(true)
     const slug = artData.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
     const { id, ...data } = artData
@@ -159,8 +232,7 @@ export default function AdminPortal() {
   }
 
   const resetAppForm = () => {
-    // ... (existing resetAppForm logic)
-    setFormData({ id: null, title: '', description: '', category: 'App', developer: 'Salman Khan', price: '', original_price: '', download_url: '', icon_url: '', version: '1.0.0', size: '', min_android: '8.0+', whats_new: '', screenshots: [] })
+    setFormData({ id: null, title: '', description: '', category: 'App', developer: 'Salman Khan', price: '', original_price: '', download_url: '', icon_url: '', version: '1.0.0', size: '', min_android: '8.0+', whats_new: '', screenshots: [], file_type: 'APK', is_trending: false, is_latest: true, is_pro_gaming: false })
     setIsFree(false)
   }
 
@@ -171,7 +243,6 @@ export default function AdminPortal() {
       <Star key={i} size={10} className={`inline transition-colors ${i < count ? 'fill-yellow-400 text-yellow-400' : 'text-gray-700'}`} />
     ));
   };
-
 
   if (!isLoggedIn) return (
     <div className="min-h-screen bg-black flex items-center justify-center p-6">
@@ -197,7 +268,7 @@ export default function AdminPortal() {
           </div>
         </header>
 
-        {/* SECURITY SETTINGS */}
+        {/* ... (Security Settings & Tabs code remains same as before) ... */}
         {showSettings && (
           <div className="mb-10 p-8 bg-blue-500/5 border border-blue-500/20 rounded-[2.5rem] animate-in slide-in-from-top-4">
             <h3 className="text-xs font-black uppercase mb-4 flex items-center gap-2"><Lock size={16}/> Security Update</h3>
@@ -208,15 +279,14 @@ export default function AdminPortal() {
           </div>
         )}
 
-        {/* TABS */}
         <div className="flex gap-4 mb-10 overflow-x-auto pb-4 no-scrollbar border-b dark:border-white/5">
           {[ 
             {id:'dashboard', l:'Stats', i:BarChart3, c:'bg-blue-600'}, 
             {id:'apps', l:'Apps', i:Package, c:'bg-[#2ea64d]'}, 
             {id:'slider', l:'Slider', i:Layout, c:'bg-purple-600'}, 
             {id:'blog', l:'Blog', i:PenTool, c:'bg-orange-500'}, 
-            {id:'reviews', l:'Reviews', i:MessageSquareText, c:'bg-yellow-600'}, // NEW TAB
-            {id:'reports', l:'Incidents', i:AlertTriangle, c:'bg-red-600'} // UPDATED LABEL
+            {id:'reviews', l:'Reviews', i:MessageSquareText, c:'bg-yellow-600'}, 
+            {id:'reports', l:'Incidents', i:AlertTriangle, c:'bg-red-600'} 
           ].map(t => (
             <button key={t.id} onClick={() => setView(t.id)} className={`px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all ${view === t.id ? `${t.c} text-white shadow-lg` : 'bg-gray-100 dark:bg-white/5'}`}>
               <t.i size={14}/> {t.l} {t.id === 'reviews' && pendingComments.length > 0 && <span className="w-5 h-5 bg-white text-yellow-600 rounded-full flex items-center justify-center -mr-1">{pendingComments.length}</span>}
@@ -226,7 +296,7 @@ export default function AdminPortal() {
 
         {message.text && <div className={`mb-6 p-4 rounded-2xl text-center text-[10px] font-black uppercase tracking-widest ${message.type === 'success' ? 'bg-[#2ea64d]/10 text-[#2ea64d]' : 'bg-red-500/10 text-red-500'}`}>{message.text}</div>}
 
-        {/* --- VIEWS --- */}
+        {/* ... (Dashboard View remains same) ... */}
         {view === 'dashboard' && (
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 animate-in fade-in">
              {[ 
@@ -270,6 +340,29 @@ export default function AdminPortal() {
                 
                 <textarea required className="w-full dark:bg-black border dark:border-white/10 p-3 rounded-xl text-xs outline-none italic" placeholder="Description" rows="2" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
                 
+                {/* --- FILE TYPE SELECTOR --- */}
+                <select 
+                    className="w-full dark:bg-black border dark:border-white/10 p-3 rounded-xl text-xs outline-none font-bold"
+                    value={formData.file_type || 'APK'}
+                    onChange={e => setFormData({...formData, file_type: e.target.value})}
+                >
+                   <option value="APK">APK (Standard)</option>
+                   <option value="XAPK">XAPK (Split/OBB)</option>
+                   <option value="ZIP">ZIP (Archive)</option>
+                </select>
+
+                {/* --- SECTION TOGGLES (Fixed) --- */}
+                <div className="flex gap-2">
+                  <div className="flex-1 p-3 border dark:border-white/10 rounded-xl bg-white dark:bg-black text-[10px] font-bold text-gray-500 uppercase italic flex justify-between items-center">
+                    <span>Trending?</span>
+                    <input type="checkbox" checked={formData.is_trending || false} onChange={(e) => setFormData({...formData, is_trending: e.target.checked})} className="w-4 h-4 accent-[#2ea64d]" />
+                  </div>
+                  <div className="flex-1 p-3 border dark:border-white/10 rounded-xl bg-white dark:bg-black text-[10px] font-bold text-gray-500 uppercase italic flex justify-between items-center">
+                    <span>Pro Gaming?</span>
+                    <input type="checkbox" checked={formData.is_pro_gaming || false} onChange={(e) => setFormData({...formData, is_pro_gaming: e.target.checked})} className="w-4 h-4 accent-[#2ea64d]" />
+                  </div>
+                </div>
+
                 {/* SCREENSHOTS */}
                 <div className="p-3 border border-dashed dark:border-white/10 rounded-xl bg-white dark:bg-black">
                    <p className="text-[8px] font-black uppercase text-gray-500 mb-2">Gallery ({formData.screenshots?.length || 0}/4)</p>
@@ -289,7 +382,10 @@ export default function AdminPortal() {
 
                 <div className="space-y-2">
                    <div className="flex items-center justify-center p-3 border border-dashed dark:border-white/10 rounded-xl relative hover:border-[#2ea64d] transition-all cursor-pointer">
-                      <Upload size={14} className="mr-2 text-[#2ea64d]"/><span className="text-[9px] font-black uppercase text-gray-500">{formData.download_url && formData.download_url.includes('supabase') ? 'Sync Ready ✅' : 'Drop APK'}</span>
+                      <Upload size={14} className="mr-2 text-[#2ea64d]"/>
+                      <span className="text-[9px] font-black uppercase text-gray-500">
+                        {uploadProgress > 0 ? `Uploading to GitHub... ${Math.round(uploadProgress)}%` : (formData.download_url && formData.download_url.includes('github') ? 'GitHub Link Ready ✅' : 'Drop APK (Fast Upload)')}
+                      </span>
                       <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={e => handleFileUpload(e, 'apks', 'apk')} />
                    </div>
                    <input className="w-full dark:bg-black border dark:border-white/10 p-3 rounded-xl text-[10px] outline-none" placeholder="...or Manual URL" value={formData.download_url} onChange={e => setFormData({...formData, download_url: e.target.value})} />
@@ -319,6 +415,7 @@ export default function AdminPortal() {
           </div>
         )}
 
+        {/* ... (Slider, Blog, Reviews, Reports views remain same as previous) ... */}
         {view === 'slider' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 animate-in fade-in">
              <form onSubmit={handleSaveSlide} className="bg-gray-50 dark:bg-[#111] p-8 rounded-[2rem] border dark:border-white/5 space-y-4 h-fit shadow-sm">
@@ -369,7 +466,6 @@ export default function AdminPortal() {
           </div>
         )}
         
-        {/* PENDING REVIEWS */}
         {view === 'reviews' && (
           <div className="space-y-4 animate-in fade-in">
              <h3 className="text-xl font-black uppercase text-yellow-500 italic mb-6 border-l-4 border-yellow-600 pl-4 tracking-tighter">Pending Orbit Reviews ({pendingComments.length})</h3>

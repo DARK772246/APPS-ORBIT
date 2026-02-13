@@ -8,7 +8,7 @@ import {
   Flame, CheckCircle, Clock, ArrowDownToLine, Smartphone, Zap, Mail, ShieldCheck, 
   Instagram, Music, PenTool, Image as ImageIcon, BellRing, DownloadCloud, ArrowUp, Trophy
 } from 'lucide-react'
-// import ThemeToggle from '../components/ThemeToggle' <-- YE LINE HATA DENI HAI
+// ThemeToggle import removed
 import Navbar from '../components/Navbar'
 import HeroSlider from '../components/HeroSlider'
 import AppSlider from '../components/AppSlider'
@@ -45,10 +45,10 @@ export default function Home() {
     setLoading(false)
   }
 
-  // Live filtering logic
+  // --- FILTERING LOGIC ---
   const filteredApps = apps.filter(app => app.title.toLowerCase().includes(searchTerm.toLowerCase()));
-  const trending = filteredApps.filter(a => a.category === 'App').slice(0, 8);
-  const gaming = filteredApps.filter(a => a.category === 'Game').slice(0, 8);
+  const trending = filteredApps.filter(a => a.is_trending === true).slice(0, 8);
+  const gaming = filteredApps.filter(a => a.is_pro_gaming === true).slice(0, 8);
 
   const toggleWishlist = (e, id) => {
     e.preventDefault()
@@ -87,7 +87,7 @@ export default function Home() {
                 </button>
               </Link>
             </div>
-            <AppSlider apps={trending} loading={loading} />
+            <AppSlider apps={trending.length > 0 ? trending : filteredApps.slice(0,8)} loading={loading} />
           </section>
 
           {/* 4. LATEST SYNC SECTION */}
@@ -99,6 +99,22 @@ export default function Home() {
             </div>
             <AppSlider apps={filteredApps.slice(0, 8)} loading={loading} />
           </section>
+
+          {/* --- AD SLOT: Orbit_Homepage_Ad (ID: 7999676146) --- */}
+          <div className="px-6 py-12">
+            <div className="w-full mx-auto">
+              <ins 
+                className="adsbygoogle"
+                style={{ display: 'block' }}
+                data-ad-client="ca-pub-6036065566084740" 
+                data-ad-slot="7999676146" 
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+              />
+              <script dangerouslySetInnerHTML={{ __html: "(adsbygoogle = window.adsbygoogle || []).push({});" }} />
+            </div>
+          </div>
+          {/* --- END AD SLOT --- */}
 
           {/* 5. PRO GAMING SECTION */}
           <section id="games">
@@ -112,7 +128,13 @@ export default function Home() {
                 </button>
               </Link>
             </div>
-            <AppSlider apps={gaming} loading={loading} />
+            {gaming.length > 0 ? (
+               <AppSlider apps={gaming} loading={loading} />
+            ) : (
+               <div className="text-center py-10 text-gray-500 font-bold uppercase tracking-widest text-xs italic border border-dashed border-white/10 rounded-2xl">
+                 No Pro Games Added Yet. Check Admin Panel.
+               </div>
+            )}
           </section>
 
           {/* 6. REQUEST STATUS */}

@@ -2,8 +2,8 @@
 import { useEffect, useState, use } from 'react'
 import { supabase } from '../../../supabase'
 import Link from 'next/link'
-import { ArrowLeft, User, Calendar, PenTool, Globe, ChevronRight } from 'lucide-react'
-import ThemeToggle from '../../../components/ThemeToggle'
+import { ArrowLeft, PenTool } from 'lucide-react'
+// ThemeToggle import removed (Final Cleanup)
 
 export default function BlogPost({ params: paramsPromise }) {
   const params = use(paramsPromise)
@@ -17,7 +17,6 @@ export default function BlogPost({ params: paramsPromise }) {
       if (data) {
         setArticle(data)
         document.title = `${data.title} - Salman AppOrbit`
-        // Fetch more articles (excluding current one)
         const { data: more } = await supabase.from('articles').select('*').neq('id', data.id).limit(3)
         setMoreArticles(more || [])
       }
@@ -33,7 +32,6 @@ export default function BlogPost({ params: paramsPromise }) {
       {/* NAVBAR */}
       <nav className="p-4 border-b border-gray-100 dark:border-white/5 sticky top-0 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md z-50 px-6 flex justify-between">
         <Link href="/" className="text-[10px] font-black uppercase text-gray-500 flex items-center gap-2 hover:text-[#2ea64d]"><ArrowLeft size={14}/> Back</Link>
-        <ThemeToggle />
       </nav>
 
       <main className="max-w-4xl mx-auto px-6 py-16">
@@ -43,6 +41,22 @@ export default function BlogPost({ params: paramsPromise }) {
             <img src={article.image_url} alt="" className="w-full h-full object-cover shadow-inner" />
           </div>
         )}
+
+        {/* --- AD SLOT: Orbit_Blog_Ad (ID: 8880580760) --- */}
+        <div className="my-8 w-full flex justify-center">
+             <div className="min-h-[100px] w-full bg-gray-100 dark:bg-white/5 rounded-xl flex items-center justify-center overflow-hidden">
+                 <ins 
+                    className="adsbygoogle"
+                    style={{ display: 'block', width: '100%' }}
+                    data-ad-client="ca-pub-6036065566084740" 
+                    data-ad-slot="8880580760" 
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"
+                  />
+                 <script dangerouslySetInnerHTML={{ __html: "(adsbygoogle = window.adsbygoogle || []).push({});" }} />
+             </div>
+        </div>
+        {/* ------------------------------------------ */}
 
         <div className="flex flex-wrap items-center gap-6 mb-8 text-gray-400">
           <span className="bg-[#2ea64d]/10 text-[#2ea64d] px-4 py-1.5 rounded-full text-[10px] font-black uppercase italic"><PenTool size={12} className="inline mr-2"/> {article.author}</span>
@@ -58,7 +72,7 @@ export default function BlogPost({ params: paramsPromise }) {
           {article.content}
         </div>
 
-        {/* RELATED ARTICLES (MORE FROM ORBIT) */}
+        {/* RELATED ARTICLES */}
         {moreArticles.length > 0 && (
           <section className="mt-32 pt-16 border-t dark:border-white/5">
             <h3 className="text-xl font-black uppercase italic text-[#2ea64d] mb-10 tracking-widest border-l-4 border-[#2ea64d] pl-4">More Tech Insights</h3>
