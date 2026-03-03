@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --bg-deep: #020617;
+  --accent-green: #2ea64d;
+  --accent-blue: #3b82f6;
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  /* Mesh Gradient */
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(46, 166, 77, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Glassmorphism Utility */
+.glass-panel {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Squircle (Apple Style) Shape */
+.squircle {
+  border-radius: 22%; /* Standard squircle approximation */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent-green); border-radius: 10px; }
+
+/* Floating Animation */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+.animate-orbit-float { animation: float 6s ease-in-out infinite; }
