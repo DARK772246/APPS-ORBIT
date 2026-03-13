@@ -19,9 +19,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    // suppressHydrationWarning is added here to fix the "attributes didn't match" error
+    // suppressHydrationWarning added to fix theme flickering errors
     <html lang="en" suppressHydrationWarning className="dark"> 
       <head>
+        {/* --- PINTEREST VERIFICATION --- */}
+        <meta name="p:domain_verify" content="ef2436b388402b8fa92fe8350b42b012"/>
+        
         <meta name="google-site-verification" content="NhPDdeUA4e58lgelt3il5KTAcy-yNYUK88xRZlo8l9k" />
         <meta name="google-adsense-account" content="ca-pub-6036065566084740" />
         
@@ -94,7 +97,7 @@ export default function RootLayout({ children }) {
             
             <Footer />
 
-            {/* CUSTOM INSTALL BUTTON */}
+            {/* CUSTOM PWA INSTALL BUTTON */}
             <button 
               id="install-app-button" 
               style={{ display: 'none' }} 
@@ -103,6 +106,7 @@ export default function RootLayout({ children }) {
                 💾 Install AppOrbit PWA
             </button>
 
+            {/* SUPPORT WHATSAPP BUTTON */}
             <a 
               href="https://wa.me/923275176283" 
               target="_blank" 
@@ -113,7 +117,7 @@ export default function RootLayout({ children }) {
               <MessageCircle size={24}/>
             </a>
 
-            {/* PWA INSTALL LOGIC */}
+            {/* PWA INSTALLER SCRIPT */}
             <Script id="pwa-installer" strategy="afterInteractive">
               {`
                 let deferredPrompt;
@@ -140,7 +144,7 @@ export default function RootLayout({ children }) {
               `}
             </Script>
 
-            {/* PWA Service Worker Registration */}
+            {/* SERVICE WORKER REGISTRATION */}
             <Script id="pwa-sw" strategy="afterInteractive">
               {`
                 if ('serviceWorker' in navigator) {
