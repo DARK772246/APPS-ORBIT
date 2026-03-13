@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 
 // --- GITHUB CONFIG ---
-const GITHUB_TOKEN = process.env.NEXT_PUBLIC_GITHUB_TOKEN || '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'; 
+const GITHUB_TOKEN = process.env.NEXT_PUBLIC_GITHUB_TOKEN; 
 const GITHUB_REPO = "DARK772246/APPS-ORBIT";
 
 export default function AdminPortal() {
