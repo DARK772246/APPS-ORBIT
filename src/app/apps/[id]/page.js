@@ -4,8 +4,53 @@ import { supabase } from '../../../supabase';
 import Navbar from '../../../components/Navbar';
 import AppSlider from '../../../components/AppSlider';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Star, Download, Zap, ArrowLeft, Copy } from 'lucide-react';
+import { ShieldCheck, Star, Download, Zap, ArrowLeft, Copy, AlertTriangle } from 'lucide-react';
+import Link from 'next/link';
 
+// --- COMMENTS COMPONENT (Unchanged) ---
+function CommentsSection({ appId }) {
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const[userName, setUserName] = useState('');
+  const [commentText, setCommentText] = useState('');
+  const [rating, setRating] = useState(5);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => { fetchComments(); },[appId]);
+  async function fetchComments() {
+    setLoading(true);
+    const { data } = await supabase.from('comments').select('*').eq('app_id', appId).eq('approved', true).order('created_at', { ascending: false });
+    if (data) setComments(data);
+    setLoading(false);
+  }
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    const { error } = await supabase.from('comments').insert([{ app_id: appId, user_name: userName || 'Orbit User', comment_text: commentText, rating: rating, approved: false }]);
+    if (!error) { setCommentText(''); setMessage('Log Transmitted for Verification'); }
+  }
+  return (
+    <div className="mt-20">
+      <h3 className="text-xl font-black uppercase italic mb-8 border-l-4 border-yellow-500 pl-4 text-white">Mission Feedback</h3>
+      <form onSubmit={handleSubmit} className="glass-panel p-8 rounded-[3rem] border border-white/5 mb-10 shadow-2xl">
+        <input type="text" placeholder="Identity Name" className="w-full bg-black/40 p-4 rounded-2xl text-xs mb-4 outline-none border border-white/5 text-white font-bold" value={userName} onChange={(e) => setUserName(e.target.value)} />
+        <textarea required rows="3" placeholder="Data log (Experience)..." className="w-full bg-black/40 p-4 rounded-2xl text-xs mb-4 outline-none border border-white/5 text-white italic" value={commentText} onChange={(e) => setCommentText(e.target.value)} />
+        <button type="submit" className="w-full bg-blue-600 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest active:scale-95 transition-all shadow-lg">Transmit Data</button>
+        {message && <p className="mt-4 text-center text-[10px] text-[#2ea64d] font-bold uppercase italic">{message}</p>}
+      </form>
+      <div className="space-y-4">
+        {comments.map((c) => (
+          <div key={c.id} className="glass-panel p-5 rounded-2xl border border-white/5 italic">
+            <span className="font-black text-xs text-white uppercase italic">{c.user_name}</span>
+            <p className="text-gray-400 text-sm mt-2">"{c.comment_text}"</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// --- MAIN DETAIL PAGE ---
 export default function AppDetailPage({ params: paramsPromise }) {
   const params = use(paramsPromise);
   const id = params.id;
@@ -13,7 +58,7 @@ export default function AppDetailPage({ params: paramsPromise }) {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
-  const [timer, setTimer] = useState(5);
+  const[timer, setTimer] = useState(5);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -24,7 +69,7 @@ export default function AppDetailPage({ params: paramsPromise }) {
           setApp(appData);
           document.title = `${appData.title} | Salman AppOrbit`;
           const { data: relData } = await supabase.from('apps').select('*').eq('category', appData.category).neq('id', id).limit(6);
-          setRelated(relData || []);
+          setRelated(relData ||[]);
         }
       } catch (err) { console.error(err); }
       setLoading(false);
@@ -41,7 +86,7 @@ export default function AppDetailPage({ params: paramsPromise }) {
       clearInterval(interval);
     }
     return () => clearInterval(interval);
-  }, [showDownloadModal, timer]);
+  },[showDownloadModal, timer]);
 
   if (loading) return <div className="min-h-screen bg-[#020617] flex items-center justify-center text-[#2ea64d] font-black animate-pulse uppercase tracking-[0.5em] italic">Syncing Orbit...</div>;
   if (!app) return <div className="min-h-screen bg-[#020617] flex items-center justify-center text-white font-black italic uppercase">Target Not Found</div>;
@@ -49,17 +94,19 @@ export default function AppDetailPage({ params: paramsPromise }) {
   return (
     <div className="min-h-screen bg-[#020617] text-white font-sans pb-20">
       <Navbar />
-      <main className="max-w-6xl mx-auto px-6 pt-32 lg:pt-40 text-center md:text-left">
-        <section className="flex flex-col md:flex-row gap-10 items-center md:items-start mb-20">
+      <main className="max-w-6xl mx-auto px-6 pt-32 lg:pt-40">
+        <section className="flex flex-col md:flex-row gap-10 items-center md:items-start mb-20 text-center md:text-left">
           <div className="w-44 h-44 md:w-52 md:h-52 glass-panel squircle overflow-hidden border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
             {app.icon_url ? <img src={app.icon_url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-7xl">📱</div>}
           </div>
           <div className="flex-1">
             <h1 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter mb-4 leading-none">{app.title}</h1>
             <p className="text-[#2ea64d] font-black text-xs mb-10 tracking-[0.4em] uppercase italic opacity-80">{app.category} • Orbit Verified</p>
-            <button onClick={() => { setShowDownloadModal(true); setTimer(5); setIsReady(false); }} className="bg-[#2ea64d] text-white font-black px-12 py-5 rounded-2xl uppercase text-[11px] shadow-xl active:scale-95 transition-all italic tracking-widest">
-                <Download size={18} className="inline mr-2" /> Access Link
-            </button>
+            <div className="flex flex-wrap justify-center md:justify-start gap-4">
+              <button onClick={() => { setShowDownloadModal(true); setTimer(5); setIsReady(false); }} className="bg-[#2ea64d] text-white font-black px-12 py-5 rounded-2xl uppercase text-[11px] shadow-xl active:scale-95 transition-all flex items-center gap-3 italic tracking-widest">
+                <Download size={18} /> Access Link
+              </button>
+            </div>
           </div>
         </section>
 
@@ -69,10 +116,7 @@ export default function AppDetailPage({ params: paramsPromise }) {
             <p className="text-gray-400 leading-relaxed font-medium italic text-lg whitespace-pre-wrap">"{app.description}"</p>
         </div>
 
-        <section className="mt-32">
-          <h2 className="text-2xl font-black uppercase italic mb-10 border-l-4 border-orange-500 pl-6 text-white leading-none tracking-tighter">Similar <span className="text-orange-500">Inventory</span></h2>
-          <AppSlider apps={related} loading={false} />
-        </section>
+        <CommentsSection appId={app.id} />
       </main>
 
       <AnimatePresence>
@@ -91,18 +135,29 @@ export default function AppDetailPage({ params: paramsPromise }) {
                   </div>
                 ) : (
                   <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="animate-in fade-in zoom-in">
-                    <ShieldCheck className="mx-auto mb-6 text-blue-500" size={40} />
                     
-                    {/* ✅ THE ULTIMATE BYPASS LINK: No Router Interference ✅ */}
-                    <a 
-                      href={app.download_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      download
-                      className="block w-full bg-[#2ea64d] hover:bg-[#268a40] text-white font-black py-5 rounded-2xl uppercase text-[12px] shadow-2xl shadow-green-500/40 active:scale-95 transition-all text-center italic tracking-widest no-underline"
-                    >
-                      Download APK Now
-                    </a>
+                    {/* ✅ FIX: AGAR LINK KHALI HAI TOH ERROR DIKHAO ✅ */}
+                    {app.download_url && app.download_url.length > 5 ? (
+                        <>
+                          <ShieldCheck className="mx-auto mb-6 text-blue-500" size={40} />
+                          <a 
+                            href={app.download_url} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            download
+                            className="block w-full bg-[#2ea64d] hover:bg-[#268a40] text-white font-black py-5 rounded-2xl uppercase text-[12px] shadow-2xl shadow-green-500/40 active:scale-95 transition-all text-center italic tracking-widest no-underline"
+                          >
+                            Download APK Now
+                          </a>
+                        </>
+                    ) : (
+                        <div className="text-red-500">
+                          <AlertTriangle className="mx-auto mb-4" size={40} />
+                          <p className="text-[10px] font-black uppercase tracking-widest">Link Not Configured!</p>
+                          <p className="text-[8px] text-gray-400 mt-2">Admin must provide a valid URL.</p>
+                        </div>
+                    )}
+
                   </motion.div>
                 )}
               </div>
